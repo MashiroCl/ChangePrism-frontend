@@ -7,6 +7,8 @@
             :fileName="file.name + ' (Before)'"
             :content="file.preChange"
             :preChangeRange="file.preChangeRange"
+            :microChanges="file.preMicroChanges"
+            :refactorings="file.preRefactorings"
             class="file-viewer"
           />
         </div>
@@ -15,6 +17,8 @@
             :fileName="file.name + ' (After)'"
             :content="file.postChange"
             :postChangeRange="file.postChangeRange"
+            :microChanges="file.postMicroChanges"
+            :refactorings="file.postRefactorings"
             class="file-viewer"
           />
         </div>
@@ -38,7 +42,6 @@ export default {
     }
   },
   mounted() {
-    // Fetch data for the default commit on component mount
     this.fetchCommitData();
   },
   methods: {
@@ -49,33 +52,34 @@ export default {
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        const files = Object.keys(data.preChangeSourceCode).map(filePath => {
-          const preChangeLines = data.preChangeSourceCode[filePath].split(/\r?\n/); // Split by newline preserving newline characters
-          const postChangeLines = data.postChangeSourceCode[filePath].split(/\r?\n/); // Split by newline preserving newline characters
+        this.files = Object.keys(data.preChangeSourceCode).map(filePath => {
+          const preChangeLines = data.preChangeSourceCode[filePath].split(/\r?\n/);
+          const postChangeLines = data.postChangeSourceCode[filePath].split(/\r?\n/);
           return {
             name: filePath,
-            preChange: preChangeLines.map(line => line + '\n'), // Append newline character to each line
-            postChange: postChangeLines.map(line => line + '\n'), // Append newline character to each line
+            preChange: preChangeLines.map(line => line + '\n'),
+            postChange: postChangeLines.map(line => line + '\n'),
             preChangeRange: this.getLineRange(data.preChangeRange[filePath]),
-            postChangeRange: this.getLineRange(data.postChangeRange[filePath])
+            postChangeRange: this.getLineRange(data.postChangeRange[filePath]),
+            preMicroChanges: data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)),
+            postMicroChanges: data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)),
+            preRefactorings: data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)),
+            postRefactorings: data.refactorings.filter(ref =>ref.rightSideLocations.some(loc => loc.path === filePath))
           };
         });
-        this.files = files;
       } catch (error) {
         console.error('Error fetching commit data:', error);
       }
     },
     getLineRange(range) {
       if (!range) return {};
-      console.log("range",range);
       const lineRange = {};
-      for(let i=0;i<range.length;i++){
+      for (let i = 0; i < range.length; i++) {
         const [start, end] = range[i];
         for (let j = start; j <= end; j++) {
-        lineRange[j - 1] = true;
+          lineRange[j - 1] = true;
+        }
       }
-      }
-      console.log("lineRange", lineRange);
       return lineRange;
     }
   }
@@ -84,7 +88,7 @@ export default {
 
 <style>
 #app {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: monospace, Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
   margin: 0;
 }
