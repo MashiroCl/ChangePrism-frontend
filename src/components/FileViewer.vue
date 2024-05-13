@@ -80,7 +80,9 @@ export default {
         for(let i=0;i<refactorings.length;i++){
           type.push(refactorings[i].type);
         }
-        const result = type.join(",");
+
+        const uniqueSet = new Set(type);
+        const result = Array.from(uniqueSet).join(",");
         console.log("result: ", result);
         return result.length? result : '';
       }
