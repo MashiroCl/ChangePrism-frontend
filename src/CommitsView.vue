@@ -1,28 +1,38 @@
 <template>
-    <div>
+    <div class="container">
         <div class="commits">
-            <div v-for="(commitGroup, index) in commitDetails" :key="'group-' + index">
-                <a :href="`/commits/${commitGroup[0].sha1}`">
-                <h3>SHA1: {{ commitGroup[0].sha1 }}</h3>
+            <!-- Commit Group section -->
+            <section v-for="(commitGroup, index) in commitDetails" :key="'group-' + index" class="commit-group">
+                <!-- Commit SHA1 and link -->
+                <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
+                    <h3 class="commit-title">Commit SHA1: {{ commitGroup[0].sha1 }}</h3>
                 </a>
-                <ul>
-                    <li v-for="(fileChange, idx) in commitGroup" :key="'commit-' + idx">
-                        Path: {{ fileChange.filePath }}
-                        <DiffThumbnail
-                        :totalLength="Math.max(fileChange.preChangeSize, fileChange.postChangeSize)"
-                        :left = "fileChange.preChangeRange"
-                        :right = "fileChange.postChangeRange"
-                        :microChangeLeft = "fileChange.preMicroChangeRange"
-                        :microChangeRight = "fileChange.postMicroChangeRange"
-                        :refactoringLeft = "fileChange.preRefactoringRange"
-                        :refactoringRight = "fileChange.postRefactoringRange"
-                        />
-                    </li>
-                </ul>
-            </div>
+                <!-- File changes list with DiffThumbnail on the right -->
+                <div class="files-container">
+                    <ul>
+                        <li v-for="(fileChange, idx) in commitGroup" :key="'file-' + idx" class="file-change">
+                            <div class="file-details">
+                                <div class="file-path">File: {{ fileChange.filePath }}</div>
+                            </div>
+                            <div class="thumbnail-container">
+                                <DiffThumbnail
+                                    :totalLength="Math.max(fileChange.preChangeSize, fileChange.postChangeSize)"
+                                    :left="fileChange.preChangeRange"
+                                    :right="fileChange.postChangeRange"
+                                    :microChangeLeft="fileChange.preMicroChangeRange"
+                                    :microChangeRight="fileChange.postMicroChangeRange"
+                                    :refactoringLeft="fileChange.preRefactoringRange"
+                                    :refactoringRight="fileChange.postRefactoringRange"
+                                />
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
         </div>
     </div>
 </template>
+
 
 <script>
 import DiffThumbnail from "./components/DiffThumbnail";
@@ -149,17 +159,77 @@ export default{
 }
 </script>
 
-<style>
-.commitsview{
 
+<style scoped>
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    font-family: monospace, Arial, sans-serif;
 }
 
-.commits{
-
+.commits {
+    background: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
 }
 
-.diffview{
-
+.commit-group {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
 }
 
+.commit-link {
+    text-decoration: none;
+    color: #3498db;
+}
+
+.commit-link:hover {
+    text-decoration: underline;
+}
+
+.commit-title {
+    margin-bottom: 15px;
+}
+
+.files-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.file-change {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.file-details {
+    flex: 1;
+}
+
+.thumbnail-container {
+    flex-basis: 300px; /* Adjust based on the size of the thumbnail component */
+    padding-left: 20px;
+}
+
+.file-path {
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .file-change {
+        flex-direction: column;
+    }
+    .thumbnail-container {
+        padding-left: 0;
+        padding-top: 10px;
+    }
+}
 </style>
