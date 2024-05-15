@@ -1,14 +1,14 @@
-<template>
+  <template>
     <div>
-      <div :style="{ width: totalLength + 'px', height: '50px', display: 'flex' }">
-        <div v-for="(block, index) in blocks" :key="index">
-          <!-- Each block now has a top and bottom div -->
-          <div :style="{ width: block.width + 'px', height: '25px', backgroundColor: block.topColor }"></div>
-          <div :style="{ width: block.width + 'px', height: '25px', backgroundColor: block.bottomColor }"></div>
+      <div :style="{ height: totalLength + 'px', width: '50px', display: 'flex', flexDirection: 'column' }">
+        <div v-for="(block, index) in blocks" :key="index" :style="{ height: block.width + 'px', width: '50px', display: 'flex' }">
+          <div :style="{ width: '25px', height: '100%', backgroundColor: block.topColor }"></div>
+          <div :style="{ width: '25px', height: '100%', backgroundColor: block.bottomColor }"></div>
         </div>
       </div>
     </div>
   </template>
+  
   
   <script>
   export default {
@@ -30,7 +30,6 @@
       mergeIntervals() {
         let topColors = new Array(this.totalLength + 1).fill('grey');
         let bottomColors = new Array(this.totalLength + 1).fill('grey');
-
         // Apply colors based on left and right arrays
         this.left.forEach(interval => {
           for (let i = interval[0]; i <= interval[1]; i++) {
@@ -72,7 +71,6 @@
 
         if(this.microChangeLeft){
             this.microChangeLeft.forEach(interval => {
-                console.log("microchange here");
             for (let i = interval[0]; i <= interval[1]; i++) {
                 topColors[i] = 'purple';
                 bottomColors[i] = 'purple';
@@ -82,7 +80,6 @@
 
         if(this.microChangeRight){
             this.microChangeRight.forEach(interval => {
-                console.log("microchange here");
             for (let i = interval[0]; i <= interval[1]; i++) {
                 topColors[i] = 'purple';
                 bottomColors[i] = 'purple';
@@ -123,11 +120,9 @@
   </script>
   
   <style scoped>
-.rectangle-top{
-
-}
-.rectangle-bottom{
-    
+.rectangle-top,
+.rectangle-bottom {
+  transition: all 0.3s ease;
 }
   </style>
   

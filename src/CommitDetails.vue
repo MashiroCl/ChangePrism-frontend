@@ -1,8 +1,10 @@
 <template>
-    <div>
-        <div class="files-container" v-for="(file, index) in files" :key="index">
-      <div class="file-viewer-container">
-        <div class="file-viewer-wrap">
+  <div>
+    <div class="files-container" v-for="(file, index) in files" :key="index">
+      <!-- Use a flex container to keep elements horizontally aligned -->
+      <div class="file-viewer-container" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- FileViewer Before -->
+        <div class="file-viewer-wrap" style="flex-grow: 1; padding: 10px;">
           <FileViewer
             :fileName="file.name + ' (Before)'"
             :content="file.preChange"
@@ -12,7 +14,20 @@
             class="file-viewer"
           />
         </div>
-        <div class="file-viewer-wrap">
+        <!-- DiffThumbnail -->
+        <div class="thumbnail-container" style="flex-grow: 0; padding: 10px; max-width: 100px;">
+          <DiffThumbnail
+            :totalLength="Math.max(file.preChange.length, file.postChange.length)"
+            :left="this.convertMapToArray(file.preChangeRange)"
+            :right="this.convertMapToArray(file.postChangeRange)"
+            :microChangeLeft="file.preMicroChanges.map(mc => mc.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :microChangeRight="file.postMicroChanges.map(mc => mc.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :refactoringLeft="file.preRefactorings.map(ref => ref.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :refactoringRight="file.postRefactorings.map(ref => ref.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+          />
+        </div>
+        <!-- FileViewer After -->
+        <div class="file-viewer-wrap" style="flex-grow: 1; padding: 10px;">
           <FileViewer
             :fileName="file.name + ' (After)'"
             :content="file.postChange"
@@ -24,18 +39,19 @@
         </div>
       </div>
     </div>
-    </div>
-
+  </div>
 </template>
 
 
 <script>
 import FileViewer from "./components/FileViewer.vue";
+import DiffThumbnail from "./components/DiffThumbnail.vue";
 
 export default {
   name: 'CommitDetails',
   components: {
-    FileViewer
+    FileViewer,
+    DiffThumbnail
   },
   data() {
     return {
@@ -83,6 +99,18 @@ export default {
         }
       }
       return lineRange;
+    },
+    convertMapToArray(map){
+      const keys = Object.keys(map).map(Number).sort((a, b) => a - b);
+      const ranges = [];
+      keys.forEach(key => {
+      if (map[key]) {
+        ranges.push([key, key]);
+      }
+      console.log("ranges", ranges);
+  });
+  return ranges;
+
     }
   }
 }
