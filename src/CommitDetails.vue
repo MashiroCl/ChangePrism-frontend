@@ -18,6 +18,8 @@
         <div class="thumbnail-container" style="flex-grow: 0; padding: 10px; max-width: 100px;">
           <DiffThumbnail
             :totalLength="Math.max(file.preChange.length, file.postChange.length)"
+            :texturalLeft="this.convertMapToArray(file.preTexturalChangeRange)"
+            :texturalRight="this.convertMapToArray(file.postTexturalChangeRange)"
             :left="this.convertMapToArray(file.preChangeRange)"
             :right="this.convertMapToArray(file.postChangeRange)"
             :microChangeLeft="file.preMicroChanges.map(mc => mc.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
@@ -77,6 +79,8 @@ export default {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
             postChange: postChangeLines.map(line => line + '\n'),
+            preTexturalChangeRange: this.getLineRange(data.preTexturalChangeRange[filePath]),
+            postTexturalChangeRange: this.getLineRange(data.postTexturalChangeRange[filePath]),
             preChangeRange: this.getLineRange(data.preChangeRange[filePath]),
             postChangeRange: this.getLineRange(data.postChangeRange[filePath]),
             preMicroChanges: data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)),

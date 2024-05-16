@@ -14,6 +14,8 @@
   export default {
     props:{
         totalLength: Number,
+        texturalLeft: Array,
+        texturalRight: Array,
         left: Array,
         right: Array,
         microChangeLeft: Array,
@@ -30,6 +32,23 @@
       mergeIntervals() {
         let topColors = new Array(this.totalLength + 1).fill('grey');
         let bottomColors = new Array(this.totalLength + 1).fill('grey');
+
+        // Apply colors based on texturalLeft and texturalRight arrays
+        this.texturalLeft.forEach(interval => {
+          for (let i = interval[0]; i <= interval[1]; i++) {
+            console.log("yellow", i);
+            topColors[i] = 'yellow';
+            bottomColors[i] = 'yellow'; 
+          }
+        });
+
+        this.texturalRight.forEach(interval => {
+          for (let i = interval[0]; i <= interval[1]; i++) {
+            topColors[i] = 'yellow';
+            bottomColors[i] = 'yellow'; 
+          }
+        });
+
         // Apply colors based on left and right arrays
         this.left.forEach(interval => {
           for (let i = interval[0]; i <= interval[1]; i++) {
@@ -51,7 +70,6 @@
 
         if(this.refactoringLeft){
             this.refactoringLeft.forEach(interval => {
-                console.log("refactoring here");
             for (let i = interval[0]; i <= interval[1]; i++) {
                 topColors[i] = 'blue';
                 bottomColors[i] = 'blue';
@@ -60,7 +78,6 @@
         }
         if(this.refactoringRight){
             this.refactoringRight.forEach(interval => {
-                console.log("refactoring here");
             for (let i = interval[0]; i <= interval[1]; i++) {
                 topColors[i] = 'blue';
                 bottomColors[i] = 'blue';

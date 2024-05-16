@@ -17,6 +17,8 @@
                             <div class="thumbnail-container">
                                 <DiffThumbnail
                                     :totalLength="Math.max(fileChange.preChangeSize, fileChange.postChangeSize)"
+                                    :texturalLeft="fileChange.preTexturalChangeRange"
+                                    :texturalRight="fileChange.postTexturalChangeRange"
                                     :left="fileChange.preChangeRange"
                                     :right="fileChange.postChangeRange"
                                     :microChangeLeft="fileChange.preMicroChangeRange"
@@ -60,6 +62,8 @@ export default{
             const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
             const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
             return Object.keys(commit.preChangeSourceCode).map(filePath => {
+                const preTexturalChangeRange = commit.preTexturalChangeRange[filePath] || [];
+                const postTexturalChangeRange = commit.postTexturalChangeRange[filePath] || [];
                 const preChangeRange = commit.preChangeRange[filePath] || [];
                 const postChangeRange = commit.postChangeRange[filePath] || [];
                 const preMicroChangeRange = microChanges.left[filePath];
@@ -69,6 +73,8 @@ export default{
                 return {
                     sha1: commit.sha1,
                     filePath:filePath,
+                    preTexturalChangeRange: preTexturalChangeRange,
+                    postTexturalChangeRange: postTexturalChangeRange,
                     preChangeRange: preChangeRange,
                     postChangeRange: postChangeRange,
                     preChangeSize: commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
