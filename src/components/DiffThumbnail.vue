@@ -36,7 +36,6 @@
         // Apply colors based on texturalLeft and texturalRight arrays
         this.texturalLeft.forEach(interval => {
           for (let i = interval[0]; i <= interval[1]; i++) {
-            console.log("yellow", i);
             topColors[i] = 'yellow';
             bottomColors[i] = 'yellow'; 
           }

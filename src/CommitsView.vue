@@ -1,8 +1,16 @@
 <template>
     <div class="container">
+        <div class="filters">
+            <label><input type="checkbox" v-model="showTexturalChanges"> Textural Diff</label>
+            <label><input type="checkbox" v-model="showChanges"> In-method Diff</label>
+            <label><input type="checkbox" v-model="showMicroChanges"> Micro Changes</label>
+            <label><input type="checkbox" v-model="showRefactorings"> Refactorings</label>
+            <button @click="updateThumbnails">Update Thumbnails</button>
+
+        </div>
         <div class="commits">
             <!-- Commit Group section -->
-            <section v-for="(commitGroup, index) in commitDetails" :key="'group-' + index" class="commit-group">
+            <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" class="commit-group">
                 <!-- Commit SHA1 and link -->
                 <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
                     <h3 class="commit-title">Commit SHA1: {{ commitGroup[0].sha1 }}</h3>
@@ -16,6 +24,7 @@
                             </div>
                             <div class="thumbnail-container">
                                 <DiffThumbnail
+                                    :key="`file-${idx}-${uniqueKey}`"
                                     :totalLength="Math.max(fileChange.preChangeSize, fileChange.postChangeSize)"
                                     :texturalLeft="fileChange.preTexturalChangeRange"
                                     :texturalRight="fileChange.postTexturalChangeRange"
@@ -45,7 +54,13 @@ export default{
     },   
     data() {
     return {
-      commitDetails: []
+      commitDetails: [],
+      showTexturalChanges: true,
+      showChanges: true,
+      showMicroChanges: true,
+      showRefactorings: true,
+      uniqueKey: 0,
+      filteredCommitDetails: []
     }
     },
     mounted(){
@@ -70,23 +85,25 @@ export default{
                 const postMicroChangeRange = microChanges.right[filePath];
                 const preRefactoringRange = refactorings.left[filePath];
                 const postRefactoringRange = refactorings.right[filePath];
+                console.log("this.showTexturalChanges ", this.showTexturalChanges);
                 return {
                     sha1: commit.sha1,
                     filePath:filePath,
-                    preTexturalChangeRange: preTexturalChangeRange,
-                    postTexturalChangeRange: postTexturalChangeRange,
-                    preChangeRange: preChangeRange,
-                    postChangeRange: postChangeRange,
-                    preChangeSize: commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
+                    preTexturalChangeRange: this.showTexturalChanges? preTexturalChangeRange: [],
+                    postTexturalChangeRange: this.showTexturalChanges? postTexturalChangeRange: [],
+                    preChangeRange: this.showChanges? preChangeRange: [],
+                    postChangeRange: this.showChanges? postChangeRange: [],
+                    preChangeSize:  commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
                     postChangeSize: commit.postChangeSourceCode[filePath].split(/\r?\n/).length,
-                    preMicroChangeRange: preMicroChangeRange,
-                    postMicroChangeRange: postMicroChangeRange,
-                    preRefactoringRange: preRefactoringRange,
-                    postRefactoringRange: postRefactoringRange
+                    preMicroChangeRange: this.showMicroChanges? preMicroChangeRange: [],
+                    postMicroChangeRange: this.showMicroChanges? postMicroChangeRange: [],
+                    preRefactoringRange: this.showRefactorings? preRefactoringRange: [],
+                    postRefactoringRange: this.showRefactorings? postRefactoringRange: []
                 }
             });
         });
         this.commitDetails = this.groupBySha1(commitDetails);
+        this.updateThumbnails();
       } catch (error) {
         console.error('Error fetching commit data:', error);
       }
@@ -160,7 +177,23 @@ export default{
             this.sha1s.push(item.sha1);
         }
     });
-    }
+    },
+    updateThumbnails() {
+            this.filteredCommitDetails = this.commitDetails.map(commitGroup => 
+                commitGroup.map(fileChange => ({
+                    ...fileChange,
+                    preTexturalChangeRange: this.showTexturalChanges ? fileChange.preTexturalChangeRange : [],
+                    postTexturalChangeRange: this.showTexturalChanges ? fileChange.postTexturalChangeRange : [],
+                    preChangeRange: this.showChanges ? fileChange.preChangeRange : [],
+                    postChangeRange: this.showChanges ? fileChange.postChangeRange : [],
+                    preMicroChangeRange: this.showMicroChanges ? fileChange.preMicroChangeRange : [],
+                    postMicroChangeRange: this.showMicroChangeRange ? fileChange.postMicroChangeRange : [],
+                    preRefactoringRange: this.showRefactorings ? fileChange.preRefactoringRange : [],
+                    postRefactoringRange: this.showRefactorings ? fileChange.postRefactoringRange : []
+                }))
+            );
+            this.uniqueKey++; // Change the unique key to force re-rendering
+        }
     }
 }
 </script>
