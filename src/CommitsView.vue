@@ -1,12 +1,11 @@
 <template>
     <div class="container">
         <div class="filters">
-            <label><input type="checkbox" v-model="showTexturalChanges"> Textural Diff</label>
+            <label><input type="checkbox" v-model="showTextualChanges"> Textual Diff</label>
             <label><input type="checkbox" v-model="showChanges"> In-method Diff</label>
             <label><input type="checkbox" v-model="showMicroChanges"> Micro Changes</label>
             <label><input type="checkbox" v-model="showRefactorings"> Refactorings</label>
             <button @click="updateThumbnails">Update Thumbnails</button>
-
         </div>
         <div class="commits">
             <!-- Commit Group section -->
@@ -26,8 +25,8 @@
                                 <DiffThumbnail
                                     :key="`file-${idx}-${uniqueKey}`"
                                     :totalLength="Math.max(fileChange.preChangeSize, fileChange.postChangeSize)"
-                                    :texturalLeft="fileChange.preTexturalChangeRange"
-                                    :texturalRight="fileChange.postTexturalChangeRange"
+                                    :textualLeft="fileChange.preTextualChangeRange"
+                                    :textualRight="fileChange.postTextualChangeRange"
                                     :left="fileChange.preChangeRange"
                                     :right="fileChange.postChangeRange"
                                     :microChangeLeft="fileChange.preMicroChangeRange"
@@ -55,7 +54,7 @@ export default{
     data() {
     return {
       commitDetails: [],
-      showTexturalChanges: true,
+      showTextualChanges: true,
       showChanges: true,
       showMicroChanges: true,
       showRefactorings: true,
@@ -77,20 +76,19 @@ export default{
             const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
             const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
             return Object.keys(commit.preChangeSourceCode).map(filePath => {
-                const preTexturalChangeRange = commit.preTexturalChangeRange[filePath] || [];
-                const postTexturalChangeRange = commit.postTexturalChangeRange[filePath] || [];
+                const preTextualChangeRange = commit.preTextualChangeRange[filePath] || [];
+                const postTextualChangeRange = commit.postTextualChangeRange[filePath] || [];
                 const preChangeRange = commit.preChangeRange[filePath] || [];
                 const postChangeRange = commit.postChangeRange[filePath] || [];
                 const preMicroChangeRange = microChanges.left[filePath];
                 const postMicroChangeRange = microChanges.right[filePath];
                 const preRefactoringRange = refactorings.left[filePath];
                 const postRefactoringRange = refactorings.right[filePath];
-                console.log("this.showTexturalChanges ", this.showTexturalChanges);
                 return {
                     sha1: commit.sha1,
                     filePath:filePath,
-                    preTexturalChangeRange: this.showTexturalChanges? preTexturalChangeRange: [],
-                    postTexturalChangeRange: this.showTexturalChanges? postTexturalChangeRange: [],
+                    preTextualChangeRange: this.showTextualChanges? preTextualChangeRange: [],
+                    postTextualChangeRange: this.showTextualChanges? postTextualChangeRange: [],
                     preChangeRange: this.showChanges? preChangeRange: [],
                     postChangeRange: this.showChanges? postChangeRange: [],
                     preChangeSize:  commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
@@ -182,8 +180,8 @@ export default{
             this.filteredCommitDetails = this.commitDetails.map(commitGroup => 
                 commitGroup.map(fileChange => ({
                     ...fileChange,
-                    preTexturalChangeRange: this.showTexturalChanges ? fileChange.preTexturalChangeRange : [],
-                    postTexturalChangeRange: this.showTexturalChanges ? fileChange.postTexturalChangeRange : [],
+                    preTextualChangeRange: this.showTextualChanges ? fileChange.preTextualChangeRange : [],
+                    postTextualChangeRange: this.showTextualChanges ? fileChange.postTextualChangeRange : [],
                     preChangeRange: this.showChanges ? fileChange.preChangeRange : [],
                     postChangeRange: this.showChanges ? fileChange.postChangeRange : [],
                     preMicroChangeRange: this.showMicroChanges ? fileChange.preMicroChangeRange : [],

@@ -19,6 +19,8 @@ export default {
     props: {
       content: Array,
       fileName: String,
+      preTextualDiff: Array,
+      postTextualDiff: Array,
       preChangeRange: Object,
       postChangeRange: Object,
       microChanges: Array,
@@ -38,7 +40,19 @@ export default {
         if (this.isPostChange(index)) {
           return "post-change";
         }
+        if (this.isPreTextualDiff(index)){
+          return "pre-textual-diff";
+        }
+        if (this.isPostTextualDiff(index)){
+          return "post-textual-diff";
+        }
         return "";
+      },
+      isPreTextualDiff(index) {
+        return this.preTextualDiff?this.preTextualDiff[index]:false;
+      },
+      isPostTextualDiff(index) {
+        return this.postTextualDiff?this.postTextualDiff[index]:false;
       },
       isMicroChange(index) {
         return this.microChanges.some(change => {
@@ -83,7 +97,6 @@ export default {
 
         const uniqueSet = new Set(type);
         const result = Array.from(uniqueSet).join(",");
-        console.log("result: ", result);
         return result.length? result : '';
       }
     }
@@ -106,6 +119,14 @@ export default {
   background-color: white;
   border: 1px solid #ccc;
   padding: 5px;
+}
+
+.pre-textual-diff {
+  background-color: rgb(247, 225, 59); /* Yellow highlight */
+}
+
+.post-textual-diff {
+  background-color: rgb(247, 225, 59); /* Yellow highlight */
 }
 
 .pre-change {

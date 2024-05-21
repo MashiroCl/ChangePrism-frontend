@@ -14,8 +14,8 @@
   export default {
     props:{
         totalLength: Number,
-        texturalLeft: Array,
-        texturalRight: Array,
+        textualLeft: Array,
+        textualRight: Array,
         left: Array,
         right: Array,
         microChangeLeft: Array,
@@ -33,15 +33,15 @@
         let topColors = new Array(this.totalLength + 1).fill('grey');
         let bottomColors = new Array(this.totalLength + 1).fill('grey');
 
-        // Apply colors based on texturalLeft and texturalRight arrays
-        this.texturalLeft.forEach(interval => {
+        // Apply colors based on textualLeft and textualRight arrays
+        this.textualLeft.forEach(interval => {
           for (let i = interval[0]; i <= interval[1]; i++) {
             topColors[i] = 'yellow';
             bottomColors[i] = 'yellow'; 
           }
         });
 
-        this.texturalRight.forEach(interval => {
+        this.textualRight.forEach(interval => {
           for (let i = interval[0]; i <= interval[1]; i++) {
             topColors[i] = 'yellow';
             bottomColors[i] = 'yellow'; 
