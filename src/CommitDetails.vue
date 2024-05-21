@@ -3,7 +3,7 @@
     <div class="filters">
             <label><input type="checkbox" v-model="showTextualChanges"> Textual Diff</label>
             <label><input type="checkbox" v-model="showChanges"> In-method Diff</label>
-            <label><input type="checkbox" v-model="showMicroChanges"> Micro Changes</label>
+            <label><input type="checkbox" v-model="showMicroChanges"> Micro-Changes</label>
             <label><input type="checkbox" v-model="showRefactorings"> Refactorings</label>
             <button @click="fetchCommitData">Update</button>
         </div>
@@ -32,10 +32,10 @@
             :textualRight="this.convertMapToArray(file.postTextualChangeRange)"
             :left="this.convertMapToArray(file.preChangeRange)"
             :right="this.convertMapToArray(file.postChangeRange)"
-            :microChangeLeft="file.preMicroChanges.map(mc => mc.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
-            :microChangeRight="file.postMicroChanges.map(mc => mc.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
-            :refactoringLeft="file.preRefactorings.map(ref => ref.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
-            :refactoringRight="file.postRefactorings.map(ref => ref.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :microChangeLeft="file.preMicroChanges.flatMap(mc => mc.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :microChangeRight="file.postMicroChanges.flatMap(mc => mc.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :refactoringLeft="file.preRefactorings.flatMap(ref => ref.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :refactoringRight="file.postRefactorings.flatMap(ref => ref.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
           />
         </div>
         <!-- FileViewer After -->
