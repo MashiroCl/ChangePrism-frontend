@@ -1,10 +1,23 @@
 <template>
     <div class="container">
         <div class="filters">
-            <label><input type="checkbox" v-model="showTextualChanges"> Textual Diff</label>
-            <label><input type="checkbox" v-model="showChanges"> In-method Diff</label>
-            <label><input type="checkbox" v-model="showMicroChanges"> Micro Changes</label>
-            <label><input type="checkbox" v-model="showRefactorings"> Refactorings</label>
+            <label>
+                <input type="checkbox" v-model="showTextualChanges"> Textual Diff
+                <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showChanges"> In-method Diff
+                <span class="color-indicator" :style="{ backgroundColor: 'red' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: 'green' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showMicroChanges"> Micro Changes
+                <span class="color-indicator" :style="{ backgroundColor: 'purple' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showRefactorings"> Refactorings
+                <span class="color-indicator" :style="{ backgroundColor: 'blue' }"></span>
+            </label>
             <button @click="updateThumbnails">Update Thumbnails</button>
         </div>
         <div class="commits">
@@ -60,7 +73,8 @@ export default{
       showMicroChanges: true,
       showRefactorings: true,
       uniqueKey: 0,
-      filteredCommitDetails: []
+      filteredCommitDetails: [],
+      textualChangeColor: "yellow"
     }
     },
     mounted(){
@@ -260,6 +274,13 @@ export default{
 .file-path {
     font-weight: bold;
 }
+.color-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-left: 5px;
+        vertical-align: middle;
+    }
 
 @media (max-width: 768px) {
     .file-change {
