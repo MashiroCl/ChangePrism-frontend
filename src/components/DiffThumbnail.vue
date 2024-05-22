@@ -1,139 +1,107 @@
   <template>
-    <div>
-      <div :style="{ height: totalLength + 'px', width: '50px', display: 'flex', flexDirection: 'column' }">
-        <div v-for="(block, index) in blocks" :key="index" :style="{ height: block.width + 'px', width: '50px', display: 'flex' }">
-          <div :style="{ width: '25px', height: '100%', backgroundColor: block.topColor }"></div>
-          <div :style="{ width: '25px', height: '100%', backgroundColor: block.bottomColor }"></div>
-        </div>
+    <div :style="{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'start', width: '100%', padding: '20px' }">
+      <!-- Left Blocks Container -->
+      <div :style="{ height: leftHeight + 'px', width: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '10px' }">
+        <div v-for="(block, index) in leftblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color}">&nbsp;</div>
+      </div>
+      <!-- Right Blocks Container -->
+      <div :style="{ height: rightHeight + 'px', width: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center' }">
+        <div v-for="(block, index) in rightblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color}">&nbsp;</div>
       </div>
     </div>
   </template>
-  
-  
+
   <script>
-  export default {
-    props:{
-        totalLength: Number,
-        textualLeft: Array,
-        textualRight: Array,
-        left: Array,
-        right: Array,
-        microChangeLeft: Array,
-        microChangeRight: Array,
-        refactoringLeft: Array,
-        refactoringRight: Array
-    },  
-    data() {
+export default {
+  props: {
+    leftHeight: Number,
+    rightHeight: Number,
+    textualLeft: Array,
+    textualRight: Array,
+    left: Array,
+    right: Array,
+    microChangeLeft: Array,
+    microChangeRight: Array,
+    refactoringLeft: Array,
+    refactoringRight: Array
+  },
+  data() {
     return {
-      blocks: []
+      leftblocks: [],
+      rightblocks: []
     };
   },
-    methods: {
-      mergeIntervals() {
-        let topColors = new Array(this.totalLength + 1).fill('grey');
-        let bottomColors = new Array(this.totalLength + 1).fill('grey');
+  methods: {
+    mergeIntervals() {
+      const leftColors = new Array();
+      for(let i =0;i<this.leftHeight + 1;i++){
+        leftColors.push('grey');
+      }
+      const rightColors = new Array(75 + 1).fill('grey');
+      for(let i =0;i<this.rightHeight + 1;i++){
+        rightColors.push('grey');
+      }
 
-        // Apply colors based on textualLeft and textualRight arrays
-        this.textualLeft.forEach(interval => {
-          for (let i = interval[0]; i <= interval[1]; i++) {
-            topColors[i] = 'yellow';
-            bottomColors[i] = 'yellow'; 
-          }
-        });
+      // Handling left color assignments
+      this.processIntervals(leftColors, this.textualLeft, 'yellow');
+      this.processIntervals(leftColors, this.left, 'red');
+      this.processIntervals(leftColors, this.refactoringLeft, 'blue');
+      this.processIntervals(leftColors, this.microChangeLeft, 'purple');
 
-        this.textualRight.forEach(interval => {
-          for (let i = interval[0]; i <= interval[1]; i++) {
-            topColors[i] = 'yellow';
-            bottomColors[i] = 'yellow'; 
-          }
-        });
+      // Handling right color assignments
+      this.processIntervals(rightColors, this.textualRight, 'yellow');
+      this.processIntervals(rightColors, this.right, 'green');
+      this.processIntervals(rightColors, this.refactoringRight, 'blue');
+      this.processIntervals(rightColors, this.microChangeRight, 'purple');
 
-        // Apply colors based on left and right arrays
-        this.left.forEach(interval => {
-          for (let i = interval[0]; i <= interval[1]; i++) {
-            topColors[i] = 'red';
-            bottomColors[i] = 'red'; // initially mark both layers as red
-          }
-        });
-  
-        this.right.forEach(interval => {
-          for (let i = interval[0]; i <= interval[1]; i++) {
-            if (topColors[i] === 'red') { // only change bottom layer if top is already red
-              bottomColors[i] = 'green'; 
-            } else {
-              topColors[i] = 'green';
-              bottomColors[i] = 'green'; // mark both layers as green if not previously red
-            }
-          }
-        });
+      this.leftblocks = this.createBlocks(leftColors, this.leftHeight);
+      console.log("this.leftblocks", this.leftblocks);
+      this.rightblocks = this.createBlocks(rightColors, this.rightHeight);
+    },
 
-        if(this.refactoringLeft){
-            this.refactoringLeft.forEach(interval => {
-            for (let i = interval[0]; i <= interval[1]; i++) {
-                topColors[i] = 'blue';
-                bottomColors[i] = 'blue';
-            }
-          });
+    processIntervals(colors, intervals, color, conditionalColor = null) {
+      if (!intervals || intervals.length === 0) {
+          return;
         }
-        if(this.refactoringRight){
-            this.refactoringRight.forEach(interval => {
-            for (let i = interval[0]; i <= interval[1]; i++) {
-                topColors[i] = 'blue';
-                bottomColors[i] = 'blue';
-            }
-          });
-        }
-
-
-        if(this.microChangeLeft){
-            this.microChangeLeft.forEach(interval => {
-            for (let i = interval[0]; i <= interval[1]; i++) {
-                topColors[i] = 'purple';
-                bottomColors[i] = 'purple';
-            }
-          });
-        }
-
-        if(this.microChangeRight){
-            this.microChangeRight.forEach(interval => {
-            for (let i = interval[0]; i <= interval[1]; i++) {
-                topColors[i] = 'purple';
-                bottomColors[i] = 'purple';
-            }
-          });
-        }
-  
-        // Consolidate contiguous blocks of the same color
-        let currentTopColor = topColors[1];
-        let currentBottomColor = bottomColors[1];
-        let start = 1;
-        for (let i = 1; i <= this.totalLength; i++) {
-          if (topColors[i] !== currentTopColor || bottomColors[i] !== currentBottomColor) {
-            this.blocks.push({
-              width: i - start,
-              topColor: currentTopColor,
-              bottomColor: currentBottomColor
-            });
-            currentTopColor = topColors[i];
-            currentBottomColor = bottomColors[i];
-            start = i;
+      intervals.forEach(interval => {
+        for (let i = interval[0]; i <= interval[1]; i++) {
+          if (!conditionalColor || colors[i] === conditionalColor) {
+            colors[i] = color;
           }
         }
-        // Push the last block
-        if (start <= this.totalLength) {
-          this.blocks.push({
-            width: this.totalLength + 1 - start,
-            topColor: currentTopColor,
-            bottomColor: currentBottomColor
+      });
+    },
+
+    createBlocks(colors, length) {
+      let blocks = [];
+      let currentColor = colors[1];
+      let start = 1;
+      for (let i = 1; i <= length; i++) {
+        if (colors[i] !== currentColor) {
+          blocks.push({
+            width: i - start,
+            color: currentColor
           });
+          currentColor = colors[i];
+          start = i;
         }
       }
-    },
-    mounted() {
-      this.mergeIntervals();
+      // Push the last block
+      if (start <= length) {
+        blocks.push({
+          width: length + 1 - start,
+          color: currentColor
+        });
+      }
+      return blocks;
     }
+  },
+  mounted() {
+    this.mergeIntervals();
   }
-  </script>
+}
+</script>
+
   
   <style scoped>
 .rectangle-top,

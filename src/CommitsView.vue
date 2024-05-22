@@ -24,7 +24,8 @@
                             <div class="thumbnail-container">
                                 <DiffThumbnail
                                     :key="`file-${idx}-${uniqueKey}`"
-                                    :totalLength="Math.max(fileChange.preChangeSize, fileChange.postChangeSize)"
+                                    :leftHeight="fileChange.preChangeSize"
+                                    :rightHeight="fileChange.postChangeSize"
                                     :textualLeft="fileChange.preTextualChangeRange"
                                     :textualRight="fileChange.postTextualChangeRange"
                                     :left="fileChange.preChangeRange"

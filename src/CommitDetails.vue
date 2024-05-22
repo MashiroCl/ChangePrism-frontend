@@ -27,7 +27,8 @@
         <div class="thumbnail-container" style="flex-grow: 0; padding: 10px; max-width: 100px;">
           <DiffThumbnail
             :key="`${thumbnailUpdateKey}`"
-            :totalLength="Math.max(file.preChange.length, file.postChange.length)"
+            :leftHeight="file.preChange.length"
+            :rightHeight="file.postChange.length"
             :textualLeft="this.convertMapToArray(file.preTextualChangeRange)"
             :textualRight="this.convertMapToArray(file.postTextualChangeRange)"
             :left="this.convertMapToArray(file.preChangeRange)"
