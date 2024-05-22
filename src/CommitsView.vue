@@ -25,14 +25,14 @@
             <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" class="commit-group">
                 <!-- Commit SHA1 and link -->
                 <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
-                    <h3 class="commit-title">Commit SHA1: {{ commitGroup[0].sha1 }}</h3>
+                    <h3 class="commit-title">Commit: {{ commitGroup[0].sha1 }}</h3>
                 </a>
                 <!-- File changes list with DiffThumbnail on the right -->
                 <div class="files-container">
                     <ul>
                         <li v-for="(fileChange, idx) in commitGroup" :key="'file-' + idx" class="file-change">
                             <div class="file-details">
-                                <div class="file-path">File: {{ fileChange.filePath }}</div>
+                                <div class="file-path">{{ fileChange.filePath }}</div>
                             </div>
                             <div class="thumbnail-container">
                                 <DiffThumbnail
