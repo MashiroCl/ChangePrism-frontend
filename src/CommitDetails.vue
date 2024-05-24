@@ -1,19 +1,34 @@
 <template>
   <div>
     <div class="filters">
-            <label><input type="checkbox" v-model="showTextualChanges"> Textual Diff</label>
-            <label><input type="checkbox" v-model="showChanges"> In-method Diff</label>
-            <label><input type="checkbox" v-model="showMicroChanges"> Micro-Changes</label>
-            <label><input type="checkbox" v-model="showRefactorings"> Refactorings</label>
+        <div class="filters">
+            <label>
+                <input type="checkbox" v-model="showTextualChanges"> Textual Diff
+                <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showChanges"> In-method Diff
+                <span class="color-indicator" :style="{ backgroundColor: 'red' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: 'green' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showMicroChanges"> Micro Changes
+                <span class="color-indicator" :style="{ backgroundColor: 'purple' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showRefactorings"> Refactorings
+                <span class="color-indicator" :style="{ backgroundColor: 'blue' }"></span>
+            </label>
             <button @click="fetchCommitData">Update</button>
         </div>
+      </div>
     <div class="files-container" v-for="(file, index) in files" :key="index">
       <!-- Use a flex container to keep elements horizontally aligned -->
       <div class="file-viewer-container" style="display: flex; align-items: flex-start; justify-content: center;">
         <!-- FileViewer Before -->
         <div class="file-viewer-wrap" style="flex-grow: 1; padding: 10px;">
           <FileViewer
-            :fileName="file.name + ' (Before)'"
+            :fileName="file.name"
             :content="file.preChange"
             :preChangeRange="file.preChangeRange"
             :microChanges="file.preMicroChanges"
@@ -24,7 +39,7 @@
           />
         </div>
         <!-- DiffThumbnail -->
-        <div class="thumbnail-container" style="flex-grow: 0; padding: 10px; max-width: 100px;">
+        <div class="thumbnail-container" style="flex-grow: 1; padding: 20px; max-width: 100px;">
           <DiffThumbnail
             :key="`${thumbnailUpdateKey}`"
             :leftHeight="file.preChange.length"
@@ -42,7 +57,7 @@
         <!-- FileViewer After -->
         <div class="file-viewer-wrap" style="flex-grow: 1; padding: 10px;">
           <FileViewer
-            :fileName="file.name + ' (After)'"
+            :fileName="file.name "
             :content="file.postChange"
             :postChangeRange="file.postChangeRange"
             :microChanges="file.postMicroChanges"
@@ -161,5 +176,13 @@ export default {
   border: 1px solid #ccc;
   padding: 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-left: 5px;
+        vertical-align: middle;
 }
 </style>

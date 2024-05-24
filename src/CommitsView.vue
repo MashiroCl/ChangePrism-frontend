@@ -280,7 +280,7 @@ export default{
         height: 10px;
         margin-left: 5px;
         vertical-align: middle;
-    }
+}
 
 @media (max-width: 768px) {
     .file-change {

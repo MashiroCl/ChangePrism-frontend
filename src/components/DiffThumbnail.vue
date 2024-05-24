@@ -1,11 +1,11 @@
   <template>
     <div :style="{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'start', width: '100%', padding: '20px' }">
       <!-- Left Blocks Container -->
-      <div :style="{ height: leftHeight + 'px', width: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '-60px' }">
+      <div :style="{ height: leftHeight + 'px', width: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '5px' }">
         <div v-for="(block, index) in leftblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color}">&nbsp;</div>
       </div>
       <!-- Right Blocks Container -->
-      <div :style="{ height: rightHeight + 'px', width: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '0px' }">
+      <div :style="{ height: rightHeight + 'px', width: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '0px' }">
         <div v-for="(block, index) in rightblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color}">&nbsp;</div>
       </div>
     </div>

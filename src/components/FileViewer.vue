@@ -1,5 +1,10 @@
 <template>
-  <h3>{{ fileName }}</h3>
+  <div class="container">
+   <h3>
+    <span class="file-name">{{ getFileName(fileName) }}</span>
+    <br>
+    <span class="file-path">{{ getFilePath(fileName) }}</span>
+  </h3>
     <div class="file-viewer">
       <div class="code-container">
         <div v-for="(line, index) in content" :key="index" class="line"
@@ -8,9 +13,10 @@
               }">
             <span class="line-number">{{ index + 1 }}</span>
             <span class="code-line" :class="getLineClass(index)">{{ line }}</span>
-        </div>
+        </div>f
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -27,6 +33,15 @@ export default {
       refactorings: Array
     },
     methods: {
+      getFilePath(fileName) {
+      const parts = fileName.split('/');
+      parts.pop(); // Remove the last part which is the file name
+      return parts.join('/') + '/';
+    },
+    getFileName(fileName) {
+      const parts = fileName.split('/');
+      return parts.pop(); // Return only the file name
+    },
       getLineClass(index) {
         if (this.isMicroChange(index+1)) {
           return "micro-change";
@@ -105,6 +120,11 @@ export default {
 
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 50vh;
+}
 .micro-change {
   background-color: rgba(128, 0, 128, 0.2); /* Purple highlight */
   cursor: pointer; /* Change cursor on hover */
@@ -136,14 +156,14 @@ export default {
   background-color: rgba(0, 255, 0, 0.2); /* Green highlight */
 }
 .file-viewer {
-  height: 300px;
-  width: 600px;
+  flex: 1;
   overflow-y: scroll;
   background-color: #f5f5f5;
   border: 1px solid #ccc;
   padding: 10px;
-  margin-bottom: 1px;
 }
+
+
 h3 {
   margin: 0;
   padding-bottom: 10px;
@@ -170,6 +190,14 @@ h3 {
   line-height: 1.5;
   font-size: 14px;
   white-space: pre-wrap;
+}
+.file-path {
+  font-size: 0.8em;
+}
+
+.file-name {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 </style>
 
