@@ -1,5 +1,8 @@
 <template>
     <div class="container">
+        <div class="timeline-container">
+            <TimeLine :commits="commitDetails" @commitClicked="scrollToCommit"/>
+        </div>
         <div class="filters">
             <label>
                 <input type="checkbox" v-model="showTextualChanges"> Textual Diff
@@ -22,7 +25,7 @@
         </div>
         <div class="commits">
             <!-- Commit Group section -->
-            <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" class="commit-group">
+            <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" :ref="'group-' + index"  class="commit-group">
                 <!-- Commit SHA1 and link -->
                 <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
                     <h3 class="commit-title">Commit: {{ commitGroup[0].sha1 }}</h3>
@@ -60,10 +63,13 @@
 
 <script>
 import DiffThumbnail from "./components/DiffThumbnail";
+import TimeLine from "./components/Timeline.vue";
+
 export default{
     name: 'CommitsView',
     components: {
-        DiffThumbnail
+        DiffThumbnail,
+        TimeLine
     },   
     data() {
     return {
@@ -160,10 +166,6 @@ export default{
                 this.sortRanges(grouped.right[path]);
             }
 
-            // for (const entry of grouped.left){
-                // console.log("grouped.left[entry]",grouped.left[entry]);
-            // }
-
             return grouped;
     },
     sortRanges(ranges) {
@@ -206,8 +208,17 @@ export default{
                 }))
             );
             this.uniqueKey++; // Change the unique key to force re-rendering
+        },
+    scrollToCommit(commit) {
+      const index = this.commitDetails.findIndex(group => group[0].sha1.replace(/^'|'$/g, '') === commit[0].sha1);
+      if (index !== -1) {
+        const element = this.$refs['group-' + index][0];
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
         }
+      }
     }
+}
 }
 </script>
 

@@ -55,7 +55,6 @@ export default {
       this.processIntervals(rightColors, this.microChangeRight, 'purple');
 
       this.leftblocks = this.createBlocks(leftColors, this.leftHeight);
-      console.log("this.leftblocks", this.leftblocks);
       this.rightblocks = this.createBlocks(rightColors, this.rightHeight);
     },
 
