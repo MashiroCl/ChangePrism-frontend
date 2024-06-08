@@ -5,11 +5,11 @@
         </div>
         <div class="filters">
             <label>
-                <input type="checkbox" v-model="showTextualChanges"> Textual Diff
+                <input type="checkbox" v-model="showModification"> Modification
                 <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
             </label>
             <label>
-                <input type="checkbox" v-model="showChanges"> In-method Diff
+                <input type="checkbox" v-model="showChanges"> Removal/Addition
                 <span class="color-indicator" :style="{ backgroundColor: 'red' }"></span>
                 <span class="color-indicator" :style="{ backgroundColor: 'green' }"></span>
             </label>
@@ -42,10 +42,10 @@
                                     :key="`file-${idx}-${uniqueKey}`"
                                     :leftHeight="fileChange.preChangeSize"
                                     :rightHeight="fileChange.postChangeSize"
-                                    :textualLeft="fileChange.preTextualChangeRange"
-                                    :textualRight="fileChange.postTextualChangeRange"
-                                    :left="fileChange.preChangeRange"
-                                    :right="fileChange.postChangeRange"
+                                    :addition="fileChange.additionChangeRange"
+                                    :removal="fileChange.removalChangeRange"
+                                    :modificationLeft="fileChange.modificationLeftChangeRange"
+                                    :modificationRight="fileChange.modificationRightChangeRange"
                                     :microChangeLeft="fileChange.preMicroChangeRange"
                                     :microChangeRight="fileChange.postMicroChangeRange"
                                     :refactoringLeft="fileChange.preRefactoringRange"
@@ -74,7 +74,7 @@ export default{
     data() {
     return {
       commitDetails: [],
-      showTextualChanges: true,
+      showModification: true,
       showChanges: true,
       showMicroChanges: true,
       showRefactorings: true,
@@ -96,11 +96,12 @@ export default{
             // collect the microchanges & refactorings
             const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
             const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
+
             return Object.keys(commit.preChangeSourceCode).map(filePath => {
-                const preTextualChangeRange = commit.preTextualChangeRange[filePath] || [];
-                const postTextualChangeRange = commit.postTextualChangeRange[filePath] || [];
-                const preChangeRange = commit.preChangeRange[filePath] || [];
-                const postChangeRange = commit.postChangeRange[filePath] || [];
+                const additionChangeRange = commit.addition[filePath] || [];
+                const removalChangeRange = commit.removal[filePath] || [];
+                const modificationLeftChangeRange = commit.modificationLeft[filePath] || [];
+                const modificationRightChangeRange = commit.modificationRight[filePath] || []
                 const preMicroChangeRange = microChanges.left[filePath];
                 const postMicroChangeRange = microChanges.right[filePath];
                 const preRefactoringRange = refactorings.left[filePath];
@@ -108,10 +109,10 @@ export default{
                 return {
                     sha1: commit.sha1,
                     filePath:filePath,
-                    preTextualChangeRange: this.showTextualChanges? preTextualChangeRange: [],
-                    postTextualChangeRange: this.showTextualChanges? postTextualChangeRange: [],
-                    preChangeRange: this.showChanges? preChangeRange: [],
-                    postChangeRange: this.showChanges? postChangeRange: [],
+                    additionChangeRange: this.showModification? additionChangeRange: [],
+                    removalChangeRange: this.showModification? removalChangeRange: [],
+                    modificationLeftChangeRange: this.showChanges? modificationLeftChangeRange: [],
+                    modificationRightChangeRange: this.showChanges? modificationRightChangeRange: [],
                     preChangeSize:  commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
                     postChangeSize: commit.postChangeSourceCode[filePath].split(/\r?\n/).length,
                     preMicroChangeRange: this.showMicroChanges? preMicroChangeRange: [],
@@ -197,14 +198,14 @@ export default{
             this.filteredCommitDetails = this.commitDetails.map(commitGroup => 
                 commitGroup.map(fileChange => ({
                     ...fileChange,
-                    preTextualChangeRange: this.showTextualChanges ? fileChange.preTextualChangeRange : [],
-                    postTextualChangeRange: this.showTextualChanges ? fileChange.postTextualChangeRange : [],
-                    preChangeRange: this.showChanges ? fileChange.preChangeRange : [],
-                    postChangeRange: this.showChanges ? fileChange.postChangeRange : [],
-                    preMicroChangeRange: this.showMicroChanges ? fileChange.preMicroChangeRange : [],
-                    postMicroChangeRange: this.showMicroChangeRange ? fileChange.postMicroChangeRange : [],
-                    preRefactoringRange: this.showRefactorings ? fileChange.preRefactoringRange : [],
-                    postRefactoringRange: this.showRefactorings ? fileChange.postRefactoringRange : []
+                    additionChangeRange: this.showModification? fileChange.additionChangeRange: [],
+                    removalChangeRange: this.showModification? fileChange.removalChangeRange: [],
+                    modificationLeftChangeRange: this.showChanges? fileChange.modificationLeftChangeRange: [],
+                    modificationRightChangeRange: this.showChanges? fileChange.modificationRightChangeRange: [],
+                    preMicroChangeRange: this.showMicroChanges? fileChange.preMicroChangeRange: [],
+                    postMicroChangeRange: this.showMicroChanges? fileChange.postMicroChangeRange: [],
+                    preRefactoringRange: this.showRefactorings? fileChange.preRefactoringRange: [],
+                    postRefactoringRange: this.showRefactorings? fileChange.postRefactoringRange: []
                 }))
             );
             this.uniqueKey++; // Change the unique key to force re-rendering

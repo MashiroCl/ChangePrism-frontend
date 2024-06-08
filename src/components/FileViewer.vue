@@ -13,7 +13,7 @@
               }">
             <span class="line-number">{{ index + 1 }}</span>
             <span class="code-line" :class="getLineClass(index)">{{ line }}</span>
-        </div>f
+        </div>
       </div>
     </div>
   </div>
@@ -25,10 +25,10 @@ export default {
     props: {
       content: Array,
       fileName: String,
-      preTextualDiff: Array,
-      postTextualDiff: Array,
-      preChangeRange: Object,
-      postChangeRange: Object,
+      removal: Array,
+      addition: Array,
+      modificationLeft: Object,
+      modificationRight: Object,
       microChanges: Array,
       refactorings: Array
     },
@@ -49,25 +49,25 @@ export default {
         if(this.isRefactoring(index+1)){
           return "refactoring";
         }
-        if (this.isPreChange(index)) {
-          return "pre-change";
+        if (this.isRemoval(index-1)) {
+          return "removal";
         }
-        if (this.isPostChange(index)) {
-          return "post-change";
+        if (this.isAddition(index-1)) {
+          return "addition";
         }
-        if (this.isPreTextualDiff(index)){
-          return "pre-textual-diff";
+        if (this.isModificationLeft(index-1)){
+          return "modificationLeft";
         }
-        if (this.isPostTextualDiff(index)){
-          return "post-textual-diff";
+        if (this.isModificationRight(index-1)){
+          return "modificationRight";
         }
         return "";
       },
-      isPreTextualDiff(index) {
-        return this.preTextualDiff?this.preTextualDiff[index]:false;
+      isRemoval(index) {
+        return this.removal?this.removal[index]:false;
       },
-      isPostTextualDiff(index) {
-        return this.postTextualDiff?this.postTextualDiff[index]:false;
+      isAddition(index) {
+        return this.addition?this.addition[index]:false;
       },
       isMicroChange(index) {
         return this.microChanges.some(change => {
@@ -81,11 +81,11 @@ export default {
           return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
         }): false;
       },
-      isPreChange(index) {
-        return this.preChangeRange && this.preChangeRange[index];
+      isModificationLeft(index) {
+        return this.modificationLeft && this.modificationLeft[index];
       },
-      isPostChange(index) {
-        return this.postChangeRange && this.postChangeRange[index];
+      isModificationRight(index) {
+        return this.modificationRight && this.modificationRight[index];
       },
       getTooltipContent(index) {
         const microchange = this.microChanges.filter(change => {
@@ -141,18 +141,18 @@ export default {
   padding: 5px;
 }
 
-.pre-textual-diff {
+.modificationLeft {
   background-color: rgb(247, 225, 59); /* Yellow highlight */
 }
 
-.post-textual-diff {
+.modificationRight {
   background-color: rgb(247, 225, 59); /* Yellow highlight */
 }
 
-.pre-change {
+.removal {
   background-color: rgba(255, 0, 0, 0.2); /* Red highlight */
 }
-.post-change {
+.addition {
   background-color: rgba(0, 255, 0, 0.2); /* Green highlight */
 }
 .file-viewer {

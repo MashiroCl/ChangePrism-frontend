@@ -16,10 +16,10 @@ export default {
   props: {
     leftHeight: Number,
     rightHeight: Number,
-    textualLeft: Array,
-    textualRight: Array,
-    left: Array,
-    right: Array,
+    addition: Array,
+    removal: Array,
+    modificationLeft: Array,
+    modificationRight: Array,
     microChangeLeft: Array,
     microChangeRight: Array,
     refactoringLeft: Array,
@@ -42,15 +42,17 @@ export default {
         rightColors.push('grey');
       }
 
+      console.log("this.addition ", this.addition);
+
       // Handling left color assignments
-      this.processIntervals(leftColors, this.textualLeft, 'yellow');
-      this.processIntervals(leftColors, this.left, 'red');
+      this.processIntervals(leftColors, this.modificationLeft, 'yellow');
+      this.processIntervals(leftColors, this.removal, 'red');
       this.processIntervals(leftColors, this.refactoringLeft, 'blue');
       this.processIntervals(leftColors, this.microChangeLeft, 'purple');
 
       // Handling right color assignments
-      this.processIntervals(rightColors, this.textualRight, 'yellow');
-      this.processIntervals(rightColors, this.right, 'green');
+      this.processIntervals(rightColors, this.modificationRight, 'yellow');
+      this.processIntervals(rightColors, this.addition, 'green');
       this.processIntervals(rightColors, this.refactoringRight, 'blue');
       this.processIntervals(rightColors, this.microChangeRight, 'purple');
 

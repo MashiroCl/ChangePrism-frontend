@@ -3,11 +3,11 @@
     <div class="filters">
         <div class="filters">
             <label>
-                <input type="checkbox" v-model="showTextualChanges"> Textual Diff
+                <input type="checkbox" v-model="Modification"> Modification
                 <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
             </label>
             <label>
-                <input type="checkbox" v-model="showChanges"> In-method Diff
+                <input type="checkbox" v-model="showChanges"> Removal/Addition
                 <span class="color-indicator" :style="{ backgroundColor: 'red' }"></span>
                 <span class="color-indicator" :style="{ backgroundColor: 'green' }"></span>
             </label>
@@ -30,11 +30,11 @@
           <FileViewer
             :fileName="file.name"
             :content="file.preChange"
-            :preChangeRange="file.preChangeRange"
+            :removal="file.removal"
+            :modificationLeft = "file.modificationLeft"
+            :modificationRight = "file.modificationRight"
             :microChanges="file.preMicroChanges"
             :refactorings="file.preRefactorings"
-            :preTextualDiff = "file.preTextualChangeRange"
-            :postTextualDiff = "file.postTextualChangeRange"
             class="file-viewer"
           />
         </div>
@@ -44,10 +44,10 @@
             :key="`${thumbnailUpdateKey}`"
             :leftHeight="file.preChange.length"
             :rightHeight="file.postChange.length"
-            :textualLeft="this.convertMapToArray(file.preTextualChangeRange)"
-            :textualRight="this.convertMapToArray(file.postTextualChangeRange)"
-            :left="this.convertMapToArray(file.preChangeRange)"
-            :right="this.convertMapToArray(file.postChangeRange)"
+            :removal="this.convertMapToArray(file.removal)"
+            :addition="this.convertMapToArray(file.addition)"
+            :modificationLeft="this.convertMapToArray(file.modificationLeft)"
+            :modificationRight="this.convertMapToArray(file.modificationRight)"
             :microChangeLeft="file.preMicroChanges.flatMap(mc => mc.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
             :microChangeRight="file.postMicroChanges.flatMap(mc => mc.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
             :refactoringLeft="file.preRefactorings.flatMap(ref => ref.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
@@ -59,11 +59,11 @@
           <FileViewer
             :fileName="file.name "
             :content="file.postChange"
-            :postChangeRange="file.postChangeRange"
+            :addition="file.addition"
+            :modificationLeft = "file.modificationLeft"
+            :modificationRight = "file.modificationRight"
             :microChanges="file.postMicroChanges"
             :refactorings="file.postRefactorings"
-            :preTextualDiff = "file.preTextualChangeRange"
-            :postTextualDiff = "file.postTextualChangeRange"
             class="file-viewer"
           />
         </div>
@@ -86,7 +86,7 @@ export default {
   data() {
     return {
       files: [],
-      showTextualChanges: true,
+      Modification: true,
       showChanges: true,
       showMicroChanges: true,
       showRefactorings: true,
@@ -112,10 +112,10 @@ export default {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
             postChange: postChangeLines.map(line => line + '\n'),
-            preTextualChangeRange: this.showTextualChanges?this.getLineRange(data.preTextualChangeRange[filePath]):[],
-            postTextualChangeRange: this.showTextualChanges?this.getLineRange(data.postTextualChangeRange[filePath]):[],
-            preChangeRange: this.showChanges?this.getLineRange(data.preChangeRange[filePath]):[],
-            postChangeRange: this.showChanges?this.getLineRange(data.postChangeRange[filePath]):[],
+            removal: this.Modification?this.getLineRange(data.removal[filePath]):[],
+            addition: this.Modification?this.getLineRange(data.addition[filePath]):[],
+            modificationLeft: this.showChanges?this.getLineRange(data.modificationLeft[filePath]):[],
+            modificationRight: this.showChanges?this.getLineRange(data.modificationRight[filePath]):[],
             preMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)):[],
             postMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)):[],
             preRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)):[],

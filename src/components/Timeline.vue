@@ -29,7 +29,7 @@
     align-items: center;
     gap: 20px;
     overflow-x: auto;
-    height: 50px;
+    height: 80px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     padding: 0 10px;
@@ -39,12 +39,12 @@
     position: relative;
   }
   .commit-circle {
-    width: 10px;
-    height: 10px;
+    width: 30px;
+    height: 30px;
     background-color: #007bff;
     border-radius: 50%;
     cursor: pointer;
-    margin-left: 30px;
+    margin-left: 20px;
   }
   .container div:last-child {
   font-family: monospace; /* Monospaced font for sha1 */
