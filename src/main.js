@@ -4,10 +4,12 @@ import VueTippy from 'vue-tippy';
 import { createRouter, createWebHistory } from  'vue-router';
 import CommitDetails from './CommitDetails';
 import CommitsView from './CommitsView';
+import CommitThumbnails from './components/CommitThumbnails.vue'
 
 const routes = [
     {path: '/commits',component: CommitsView},
-    {path: '/commits/:sha',component:CommitDetails}
+    {path: '/commits/:sha',component:CommitDetails},
+    {path: '/commitThumbnails/:sha1', name: 'commit-thumbnails', component:CommitThumbnails}
 ];
 
 const router = createRouter({

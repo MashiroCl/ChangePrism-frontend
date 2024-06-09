@@ -42,8 +42,6 @@ export default {
         rightColors.push('grey');
       }
 
-      console.log("this.addition ", this.addition);
-
       // Handling left color assignments
       this.processIntervals(leftColors, this.modificationLeft, 'yellow');
       this.processIntervals(leftColors, this.removal, 'red');

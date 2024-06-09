@@ -27,9 +27,12 @@
             <!-- Commit Group section -->
             <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" :ref="'group-' + index"  class="commit-group">
                 <!-- Commit SHA1 and link -->
-                <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
-                    <h3 class="commit-title">Commit: {{ commitGroup[0].sha1 }}</h3>
-                </a>
+                <div class="commit-header">
+                    <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
+                        <h3 class="commit-title">Commit: {{ commitGroup[0].sha1 }}</h3>
+                    </a>
+                    <button @click="viewCommitDetails(commitGroup[0].sha1)" class="view-thumbnails-button">View Thumbnails</button>
+                </div>
                 <!-- File changes list with DiffThumbnail on the right -->
                 <div class="files-container">
                     <ul>
@@ -128,6 +131,9 @@ export default{
         console.error('Error fetching commit data:', error);
       }
     },
+    viewCommitDetails(sha1) {
+        this.$router.push({ name: 'commit-thumbnails', params: { sha1 } });
+    },
     groupBySha1(commitArray) {
             return commitArray.reduce((acc, item) => {
                 const group = acc.find(g => g[0].sha1 === item.sha1);
@@ -198,10 +204,10 @@ export default{
             this.filteredCommitDetails = this.commitDetails.map(commitGroup => 
                 commitGroup.map(fileChange => ({
                     ...fileChange,
-                    additionChangeRange: this.showModification? fileChange.additionChangeRange: [],
-                    removalChangeRange: this.showModification? fileChange.removalChangeRange: [],
-                    modificationLeftChangeRange: this.showChanges? fileChange.modificationLeftChangeRange: [],
-                    modificationRightChangeRange: this.showChanges? fileChange.modificationRightChangeRange: [],
+                    additionChangeRange: this.showChanges? fileChange.additionChangeRange: [],
+                    removalChangeRange: this.showChanges? fileChange.removalChangeRange: [],
+                    modificationLeftChangeRange: this.showModification? fileChange.modificationLeftChangeRange: [],
+                    modificationRightChangeRange: this.showModification? fileChange.modificationRightChangeRange: [],
                     preMicroChangeRange: this.showMicroChanges? fileChange.preMicroChangeRange: [],
                     postMicroChangeRange: this.showMicroChanges? fileChange.postMicroChangeRange: [],
                     preRefactoringRange: this.showRefactorings? fileChange.preRefactoringRange: [],

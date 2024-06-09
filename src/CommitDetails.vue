@@ -112,15 +112,14 @@ export default {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
             postChange: postChangeLines.map(line => line + '\n'),
-            removal: this.Modification?this.getLineRange(data.removal[filePath]):[],
-            addition: this.Modification?this.getLineRange(data.addition[filePath]):[],
-            modificationLeft: this.showChanges?this.getLineRange(data.modificationLeft[filePath]):[],
-            modificationRight: this.showChanges?this.getLineRange(data.modificationRight[filePath]):[],
+            removal: this.showChanges?this.getLineRange(data.removal[filePath]):[],
+            addition: this.showChanges?this.getLineRange(data.addition[filePath]):[],
+            modificationLeft: this.Modification?this.getLineRange(data.modificationLeft[filePath]):[],
+            modificationRight: this.Modification?this.getLineRange(data.modificationRight[filePath]):[],
             preMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)):[],
             postMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)):[],
             preRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)):[],
             postRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.rightSideLocations.some(loc => loc.path === filePath)):[],
-            // preTextualDiff: this.showTextualChanges?this.getLineRange(data.preTextualChangeRange[filePath]):[],
             // postTextualDiff: this.showTextualChanges?this.getLineRange(data.postTextualChangeRange[filePath]):[]
           };
         });
