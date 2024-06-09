@@ -33,6 +33,8 @@
                     </a>
                     <button @click="viewCommitDetails(commitGroup[0].sha1)" class="view-thumbnails-button">View Thumbnails</button>
                 </div>
+                <a :href="`${commitGroup[0].url}`">{{commitGroup[0].url}}</a>
+
                 <!-- File changes list with DiffThumbnail on the right -->
                 <div class="files-container">
                     <ul>
@@ -99,6 +101,7 @@ export default{
             // collect the microchanges & refactorings
             const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
             const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
+            const url = commit.url;
 
             return Object.keys(commit.preChangeSourceCode).map(filePath => {
                 const additionChangeRange = commit.addition[filePath] || [];
@@ -112,6 +115,7 @@ export default{
                 return {
                     sha1: commit.sha1,
                     filePath:filePath,
+                    url:url,
                     additionChangeRange: this.showModification? additionChangeRange: [],
                     removalChangeRange: this.showModification? removalChangeRange: [],
                     modificationLeftChangeRange: this.showChanges? modificationLeftChangeRange: [],
@@ -251,6 +255,13 @@ export default{
     border-radius: 8px;
 }
 
+.commit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
 .commit-link {
     text-decoration: none;
     color: #3498db;
@@ -261,7 +272,11 @@ export default{
 }
 
 .commit-title {
-    margin-bottom: 15px;
+    margin: 0;
+}
+
+.view-thumbnails-button {
+    margin-left: auto;
 }
 
 .files-container {
@@ -292,12 +307,13 @@ export default{
 .file-path {
     font-weight: bold;
 }
+
 .color-indicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        margin-left: 5px;
-        vertical-align: middle;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
 }
 
 @media (max-width: 768px) {
