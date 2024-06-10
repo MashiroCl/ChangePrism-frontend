@@ -21,7 +21,7 @@
                 <input type="checkbox" v-model="showRefactorings"> Refactorings
                 <span class="color-indicator" :style="{ backgroundColor: 'blue' }"></span>
             </label>
-            <button @click="updateThumbnails">Update Thumbnails</button>
+            <button @click="updateThumbnails" :style="{ marginLeft: '50px' }">Update Thumbnails</button>
         </div>
         <div class="commits">
             <!-- Commit Group section -->
@@ -102,7 +102,8 @@ export default{
             const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
             const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
             const url = commit.url;
-
+            console.log("microchanges", microChanges);
+            console.log("refactorings", refactorings);
             return Object.keys(commit.preChangeSourceCode).map(filePath => {
                 const additionChangeRange = commit.addition[filePath] || [];
                 const removalChangeRange = commit.removal[filePath] || [];
