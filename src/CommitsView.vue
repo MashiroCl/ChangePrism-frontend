@@ -25,7 +25,7 @@
         </div>
         <div class="commits">
             <!-- Commit Group section -->
-            <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" :ref="'group-' + index"  class="commit-group">
+            <section v-for="(commitGroup, index) in filteredCommitDetails" :key="'group-' + index" :ref="'group-' + index" class="commit-group">
                 <!-- Commit SHA1 and link -->
                 <div class="commit-header">
                     <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
@@ -55,6 +55,8 @@
                                     :microChangeRight="fileChange.postMicroChangeRange"
                                     :refactoringLeft="fileChange.preRefactoringRange"
                                     :refactoringRight="fileChange.postRefactoringRange"
+                                    :refactoringTypesLeft="fileChange.refactoringTypesLeft"
+                                    :refactoringTypesRight="fileChange.refactoringTypesRight"
                                 />
                             </div>
                         </li>
@@ -65,81 +67,81 @@
     </div>
 </template>
 
-
 <script>
 import DiffThumbnail from "./components/DiffThumbnail";
 import TimeLine from "./components/Timeline.vue";
 
-export default{
+export default {
     name: 'CommitsView',
     components: {
         DiffThumbnail,
         TimeLine
-    },   
-    data() {
-    return {
-      commitDetails: [],
-      showModification: true,
-      showChanges: true,
-      showMicroChanges: true,
-      showRefactorings: true,
-      uniqueKey: 0,
-      filteredCommitDetails: [],
-      textualChangeColor: "yellow"
-    }
     },
-    mounted(){
+    data() {
+        return {
+            commitDetails: [],
+            showModification: true,
+            showChanges: true,
+            showMicroChanges: true,
+            showRefactorings: true,
+            uniqueKey: 0,
+            filteredCommitDetails: [],
+            textualChangeColor: "yellow"
+        };
+    },
+    mounted() {
         this.fetchCommitData();
     },
-    methods:{    
-    async fetchCommitData() {
-      const apiUrl = `http://localhost:8081/commits/`;
-      try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const commitDetails = data.flatMap(commit=>{
-            // collect the microchanges & refactorings
-            const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
-            const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
-            const url = commit.url;
-            console.log("microchanges", microChanges);
-            console.log("refactorings", refactorings);
-            return Object.keys(commit.preChangeSourceCode).map(filePath => {
-                const additionChangeRange = commit.addition[filePath] || [];
-                const removalChangeRange = commit.removal[filePath] || [];
-                const modificationLeftChangeRange = commit.modificationLeft[filePath] || [];
-                const modificationRightChangeRange = commit.modificationRight[filePath] || []
-                const preMicroChangeRange = microChanges.left[filePath];
-                const postMicroChangeRange = microChanges.right[filePath];
-                const preRefactoringRange = refactorings.left[filePath];
-                const postRefactoringRange = refactorings.right[filePath];
-                return {
-                    sha1: commit.sha1,
-                    filePath:filePath,
-                    url:url,
-                    additionChangeRange: this.showModification? additionChangeRange: [],
-                    removalChangeRange: this.showModification? removalChangeRange: [],
-                    modificationLeftChangeRange: this.showChanges? modificationLeftChangeRange: [],
-                    modificationRightChangeRange: this.showChanges? modificationRightChangeRange: [],
-                    preChangeSize:  commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
-                    postChangeSize: commit.postChangeSourceCode[filePath].split(/\r?\n/).length,
-                    preMicroChangeRange: this.showMicroChanges? preMicroChangeRange: [],
-                    postMicroChangeRange: this.showMicroChanges? postMicroChangeRange: [],
-                    preRefactoringRange: this.showRefactorings? preRefactoringRange: [],
-                    postRefactoringRange: this.showRefactorings? postRefactoringRange: []
-                }
-            });
-        });
-        this.commitDetails = this.groupBySha1(commitDetails);
-        this.updateThumbnails();
-      } catch (error) {
-        console.error('Error fetching commit data:', error);
-      }
-    },
-    viewCommitDetails(sha1) {
-        this.$router.push({ name: 'commit-thumbnails', params: { sha1 } });
-    },
-    groupBySha1(commitArray) {
+    methods: {
+        async fetchCommitData() {
+            const apiUrl = `http://localhost:8081/commits/`;
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const commitDetails = data.flatMap(commit => {
+                    // collect the microchanges & refactorings
+                    const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
+                    const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
+                    const url = commit.url;
+                    const refactoringTypes = commit.refactorings.map(r => r.type);
+                    return Object.keys(commit.preChangeSourceCode).map(filePath => {
+                        const additionChangeRange = commit.addition[filePath] || [];
+                        const removalChangeRange = commit.removal[filePath] || [];
+                        const modificationLeftChangeRange = commit.modificationLeft[filePath] || [];
+                        const modificationRightChangeRange = commit.modificationRight[filePath] || [];
+                        const preMicroChangeRange = microChanges.left[filePath];
+                        const postMicroChangeRange = microChanges.right[filePath];
+                        const preRefactoringRange = refactorings.left[filePath];
+                        const postRefactoringRange = refactorings.right[filePath];
+                        return {
+                            sha1: commit.sha1,
+                            filePath: filePath,
+                            url: url,
+                            additionChangeRange: this.showModification ? additionChangeRange : [],
+                            removalChangeRange: this.showModification ? removalChangeRange : [],
+                            modificationLeftChangeRange: this.showChanges ? modificationLeftChangeRange : [],
+                            modificationRightChangeRange: this.showChanges ? modificationRightChangeRange : [],
+                            preChangeSize: commit.preChangeSourceCode[filePath].split(/\r?\n/).length,
+                            postChangeSize: commit.postChangeSourceCode[filePath].split(/\r?\n/).length,
+                            preMicroChangeRange: this.showMicroChanges ? preMicroChangeRange : [],
+                            postMicroChangeRange: this.showMicroChangeRange ? postMicroChangeRange : [],
+                            preRefactoringRange: this.showRefactorings ? preRefactoringRange : [],
+                            postRefactoringRange: this.showRefactorings ? postRefactoringRange : [],
+                            refactoringTypesLeft: this.showRefactorings ? refactoringTypes : [],
+                            refactoringTypesRight: this.showRefactorings ? refactoringTypes : []
+                        };
+                    });
+                });
+                this.commitDetails = this.groupBySha1(commitDetails);
+                this.updateThumbnails();
+            } catch (error) {
+                console.error('Error fetching commit data:', error);
+            }
+        },
+        viewCommitDetails(sha1) {
+            this.$router.push({ name: 'commit-thumbnails', params: { sha1 } });
+        },
+        groupBySha1(commitArray) {
             return commitArray.reduce((acc, item) => {
                 const group = acc.find(g => g[0].sha1 === item.sha1);
                 if (group) {
@@ -150,25 +152,35 @@ export default{
                 return acc;
             }, []);
         },
-    extractRangeFromSpecialChange(specialChanges){
+        extractRangeFromSpecialChange(specialChanges) {
             const grouped = {
-            left: {},
-            right: {}
-        };
-        for(const specialChange of specialChanges){
-            for (const entry of specialChange.leftSideLocations) {
-                if (!grouped.left[entry.path]) {
-                    grouped.left[entry.path] = []; // Initialize if not already
+                left: {},
+                right: {},
+                leftTypes: {},
+                rightTypes: {}
+            };
+            for (const specialChange of specialChanges) {
+                for (const entry of specialChange.leftSideLocations) {
+                    if (!grouped.left[entry.path]) {
+                        grouped.left[entry.path] = []; // Initialize if not already
+                    }
+                    grouped.left[entry.path].push([entry.startLine, entry.endLine]);
+                    if (!grouped.leftTypes[entry.path]) {
+                        grouped.leftTypes[entry.path] = [];
+                    }
+                    grouped.leftTypes[entry.path].push(specialChange.type);
                 }
-                grouped.left[entry.path].push([entry.startLine, entry.endLine]);
-            }
 
-            for (const entry of specialChange.rightSideLocations) {
-                if (!grouped.right[entry.path]) {
-                    grouped.right[entry.path] = []; // Initialize if not already
+                for (const entry of specialChange.rightSideLocations) {
+                    if (!grouped.right[entry.path]) {
+                        grouped.right[entry.path] = []; // Initialize if not already
+                    }
+                    grouped.right[entry.path].push([entry.startLine, entry.endLine]);
+                    if (!grouped.rightTypes[entry.path]) {
+                        grouped.rightTypes[entry.path] = [];
+                    }
+                    grouped.rightTypes[entry.path].push(specialChange.type);
                 }
-                grouped.right[entry.path].push([entry.startLine, entry.endLine]);
-            }
             }
 
             for (const path in grouped.left) {
@@ -179,60 +191,63 @@ export default{
             }
 
             return grouped;
-    },
-    sortRanges(ranges) {
-    ranges.sort((a, b) => a[0] - b[0]);
-    const uniqueSet = new Set(ranges.map(item => JSON.stringify(item)));
-    const uniqueArrays = Array.from(uniqueSet).map(item => JSON.parse(item));
-    ranges.length = 0; // Clear the original array
-    uniqueArrays.forEach(item => ranges.push(item)); // Push unique and sorted items back to the original array
-    },
-    groupLineRange(range) {
-      if (!range) return {};
-      const lineRange = {};
-      for (let i = 0; i < range.length; i++) {
-        const [start, end] = range[i];
-        for (let j = start; j <= end; j++) {
-          lineRange[j - 1] = true;
-        }
-      }
-      return lineRange;
-    },
-    getsha1(data){
-        data.forEach(item=>{
-        if(item.sha1){
-            this.sha1s.push(item.sha1);
-        }
-    });
-    },
-    updateThumbnails() {
-            this.filteredCommitDetails = this.commitDetails.map(commitGroup => 
+        },
+        sortRanges(ranges) {
+            ranges.sort((a, b) => a[0] - b[0]);
+            const uniqueSet = new Set(ranges.map(item => JSON.stringify(item)));
+            const uniqueArrays = Array.from(uniqueSet).map(item => JSON.parse(item));
+            ranges.length = 0; // Clear the original array
+            uniqueArrays.forEach(item => ranges.push(item)); // Push unique and sorted items back to the original array
+        },
+        groupLineRange(range) {
+            if (!range) return {};
+            const lineRange = {};
+            for (let i = 0; i < range.length; i++) {
+                const [start, end] = range[i];
+                for (let j = start; j <= end; j++) {
+                    lineRange[j - 1] = true;
+                }
+            }
+            return lineRange;
+        },
+        getsha1(data) {
+            data.forEach(item => {
+                if (item.sha1) {
+                    this.sha1s.push(item.sha1);
+                }
+            });
+        },
+        updateThumbnails() {
+            this.filteredCommitDetails = this.commitDetails.map(commitGroup =>
                 commitGroup.map(fileChange => ({
                     ...fileChange,
-                    additionChangeRange: this.showChanges? fileChange.additionChangeRange: [],
-                    removalChangeRange: this.showChanges? fileChange.removalChangeRange: [],
-                    modificationLeftChangeRange: this.showModification? fileChange.modificationLeftChangeRange: [],
-                    modificationRightChangeRange: this.showModification? fileChange.modificationRightChangeRange: [],
-                    preMicroChangeRange: this.showMicroChanges? fileChange.preMicroChangeRange: [],
-                    postMicroChangeRange: this.showMicroChanges? fileChange.postMicroChangeRange: [],
-                    preRefactoringRange: this.showRefactorings? fileChange.preRefactoringRange: [],
-                    postRefactoringRange: this.showRefactorings? fileChange.postRefactoringRange: []
+                    additionChangeRange: this.showChanges ? fileChange.additionChangeRange : [],
+                    removalChangeRange: this.showChanges ? fileChange.removalChangeRange : [],
+                    modificationLeftChangeRange: this.showModification ? fileChange.modificationLeftChangeRange : [],
+                    modificationRightChangeRange: this.showModification ? fileChange.modificationRightChangeRange : [],
+                    preMicroChangeRange: this.showMicroChanges ? fileChange.preMicroChangeRange : [],
+                    postMicroChangeRange: this.showMicroChanges ? fileChange.postMicroChangeRange : [],
+                    preRefactoringRange: this.showRefactorings ? fileChange.preRefactoringRange : [],
+                    postRefactoringRange: this.showRefactorings ? fileChange.postRefactoringRange : [],
+                    refactoringTypesLeft: this.showRefactorings ? fileChange.refactoringTypesLeft : [],
+                    refactoringTypesRight: this.showRefactorings ? fileChange.refactoringTypesRight : []
                 }))
             );
             this.uniqueKey++; // Change the unique key to force re-rendering
         },
-    scrollToCommit(commit) {
-      const index = this.commitDetails.findIndex(group => group[0].sha1.replace(/^'|'$/g, '') === commit[0].sha1);
-      if (index !== -1) {
-        const element = this.$refs['group-' + index][0];
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+        scrollToCommit(commit) {
+            const index = this.commitDetails.findIndex(group => group[0].sha1.replace(/^'|'$/g, '') === commit[0].sha1);
+            if (index !== -1) {
+                const element = this.$refs['group-' + index][0];
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
         }
-      }
     }
-}
-}
+};
 </script>
+
 
 
 <style scoped>

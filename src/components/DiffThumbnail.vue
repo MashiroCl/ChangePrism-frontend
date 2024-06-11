@@ -1,17 +1,17 @@
-  <template>
-    <div :style="{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'start', width: '100%', padding: '20px' }">
-      <!-- Left Blocks Container -->
-      <div :style="{ height: leftHeight + 'px', width: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '5px' }">
-        <div v-for="(block, index) in leftblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color}">&nbsp;</div>
-      </div>
-      <!-- Right Blocks Container -->
-      <div :style="{ height: rightHeight + 'px', width: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '0px' }">
-        <div v-for="(block, index) in rightblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color}">&nbsp;</div>
-      </div>
+<template>
+  <div :style="{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'start', width: '100%', padding: '20px' }">
+    <!-- Left Blocks Container -->
+    <div :style="{ height: leftHeight + 'px', width: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '5px' }">
+      <div v-for="(block, index) in leftblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color }">&nbsp;</div>
     </div>
-  </template>
+    <!-- Right Blocks Container -->
+    <div :style="{ height: rightHeight + 'px', width: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '0px' }">
+      <div v-for="(block, index) in rightblocks" :key="index" :style="{ width: '50px', height: block.width + 'px', backgroundColor: block.color }">&nbsp;</div>
+    </div>
+  </div>
+</template>
 
-  <script>
+<script>
 export default {
   props: {
     leftHeight: Number,
@@ -23,7 +23,9 @@ export default {
     microChangeLeft: Array,
     microChangeRight: Array,
     refactoringLeft: Array,
-    refactoringRight: Array
+    refactoringRight: Array,
+    refactoringTypesLeft: Array,
+    refactoringTypesRight: Array
   },
   data() {
     return {
@@ -33,40 +35,67 @@ export default {
   },
   methods: {
     mergeIntervals() {
-      const leftColors = new Array();
-      for(let i =0;i<this.leftHeight + 1;i++){
-        leftColors.push('grey');
-      }
-      const rightColors = new Array(75 + 1).fill('grey');
-      for(let i =0;i<this.rightHeight + 1;i++){
-        rightColors.push('grey');
-      }
+      const leftColors = new Array(this.leftHeight + 1).fill('#BDC0BA'); // grey
+      const rightColors = new Array(this.rightHeight + 1).fill('#BDC0BA'); // grey
 
       // Handling left color assignments
-      this.processIntervals(leftColors, this.modificationLeft, 'yellow');
-      this.processIntervals(leftColors, this.removal, 'red');
-      this.processIntervals(leftColors, this.refactoringLeft, 'blue');
-      this.processIntervals(leftColors, this.microChangeLeft, 'purple');
+      this.processIntervals(leftColors, this.modificationLeft, '#FBE251'); // yellow
+      this.processIntervals(leftColors, this.removal, '#FF0000'); // red
+      this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft); // refactorings
+      this.processIntervals(leftColors, this.microChangeLeft, '#B28FCE'); // purple
 
       // Handling right color assignments
-      this.processIntervals(rightColors, this.modificationRight, 'yellow');
-      this.processIntervals(rightColors, this.addition, 'green');
-      this.processIntervals(rightColors, this.refactoringRight, 'blue');
-      this.processIntervals(rightColors, this.microChangeRight, 'purple');
+      this.processIntervals(rightColors, this.modificationRight, '#FBE251'); // yellow
+      this.processIntervals(rightColors, this.addition, '#227D51'); // green
+      this.processRefactorings(rightColors, this.refactoringRight, this.refactoringTypesRight); // refactorings
+      this.processIntervals(rightColors, this.microChangeRight, '#B28FCE'); // purple
 
       this.leftblocks = this.createBlocks(leftColors, this.leftHeight);
       this.rightblocks = this.createBlocks(rightColors, this.rightHeight);
     },
 
-    processIntervals(colors, intervals, color, conditionalColor = null) {
+    processIntervals(colors, intervals, defaultColor) {
       if (!intervals || intervals.length === 0) {
-          return;
-        }
+        return;
+      }
       intervals.forEach(interval => {
         for (let i = interval[0]; i <= interval[1]; i++) {
-          if (!conditionalColor || colors[i] === conditionalColor) {
-            colors[i] = color;
-          }
+          colors[i] = defaultColor;
+        }
+      });
+    },
+
+    processRefactorings(colors, intervals, types) {
+      if (!intervals || intervals.length === 0) {
+        return;
+      }
+
+      // Separate intervals by type priority
+      const highPriorityIntervals = [];
+      const mediumPriorityIntervals = [];
+      const lowPriorityIntervals = [];
+
+      intervals.forEach((interval, idx) => {
+        const type = types && types[idx] ? types[idx] : '';
+        if(type.includes('Package') || type.includes('Class') || type.includes('subClass')){
+          lowPriorityIntervals.push({ interval, type });
+        } else if (type.includes("Method") || type.includes("Parameter") || type.includes("Thrown") || type.includes("Interface")){
+          mediumPriorityIntervals.push({ interval, type });
+        } else {
+          highPriorityIntervals.push({ interval, type });
+        }
+      });
+
+      // Apply colors in reverse priority to ensure layering
+      this.applyRefactoringColors(colors, lowPriorityIntervals, '#81C7D4'); // light blue
+      this.applyRefactoringColors(colors, mediumPriorityIntervals, '#33A6B8'); // blue
+      this.applyRefactoringColors(colors, highPriorityIntervals, '#0D5661'); // dark blue
+    },
+
+    applyRefactoringColors(colors, intervals, color) {
+      intervals.forEach(({ interval }) => {
+        for (let i = interval[0]; i <= interval[1]; i++) {
+          colors[i] = color;
         }
       });
     },
@@ -101,11 +130,9 @@ export default {
 }
 </script>
 
-  
-  <style scoped>
+<style scoped>
 .rectangle-top,
 .rectangle-bottom {
   transition: all 0.3s ease;
 }
-  </style>
-  
+</style>

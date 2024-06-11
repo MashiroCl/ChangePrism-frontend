@@ -52,6 +52,8 @@
             :microChangeRight="file.postMicroChanges.flatMap(mc => mc.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
             :refactoringLeft="file.preRefactorings.flatMap(ref => ref.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
             :refactoringRight="file.postRefactorings.flatMap(ref => ref.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :refactoringTypesLeft="file.refactoringTypesLeft"
+            :refactoringTypesRight="file.refactoringTypesRight"
           />
         </div>
         <!-- FileViewer After -->
@@ -108,6 +110,7 @@ export default {
         this.files = Object.keys(data.preChangeSourceCode).map(filePath => {
           const preChangeLines = data.preChangeSourceCode[filePath].split(/\r?\n/);
           const postChangeLines = data.postChangeSourceCode[filePath].split(/\r?\n/);
+          const refactoringTypes = data.refactorings.map(r => r.type);
           return {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
@@ -120,7 +123,8 @@ export default {
             postMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)):[],
             preRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)):[],
             postRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.rightSideLocations.some(loc => loc.path === filePath)):[],
-            // postTextualDiff: this.showTextualChanges?this.getLineRange(data.postTextualChangeRange[filePath]):[]
+            refactoringTypesLeft: this.showRefactorings ? refactoringTypes : [],
+            refactoringTypesRight: this.showRefactorings ? refactoringTypes : []
           };
         });
         this.updateThumbnails();
@@ -183,5 +187,10 @@ export default {
         height: 10px;
         margin-left: 5px;
         vertical-align: middle;
+}
+
+.thumbnail-container {
+    flex-basis: 300px; /* Adjust based on the size of the thumbnail component */
+    padding-left: 20px;
 }
 </style>
