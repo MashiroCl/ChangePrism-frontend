@@ -54,7 +54,6 @@
             :refactoringRight="file.postRefactoringRange"
             :refactoringTypesLeft="file.refactoringTypesLeft"
             :refactoringTypesRight="file.refactoringTypesRight"
-          
           />
         </div>
         <!-- FileViewer After -->
@@ -108,10 +107,8 @@ export default {
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        // console.log("refactorings ", data.refactorings);
         const microChanges = this.extractFromSpecialChange(data.microChanges);
         const refactorings = this.extractFromSpecialChange(data.refactorings);
-        // console.log("refactorings after: ", refactorings);
         this.files = Object.keys(data.preChangeSourceCode).map(filePath => {
           const preChangeLines = data.preChangeSourceCode[filePath].split(/\r?\n/);
           const postChangeLines = data.postChangeSourceCode[filePath].split(/\r?\n/);
@@ -126,26 +123,18 @@ export default {
           const postRefactoringRange = refactorings.right[filePath];
           const refactoringTypesLeft = refactorings.leftTypes[filePath];
           const refactoringTypesRight = refactorings.rightTypes[filePath];
-          console.log("removalChangeRange ", removalChangeRange);
           return {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
             postChange: postChangeLines.map(line => line + '\n'),
-            // removal: this.showChanges?this.getLineRange(data.removal[filePath]):[],
-            // addition: this.showChanges?this.getLineRange(data.addition[filePath]):[],
-            // modificationLeft: this.Modification?this.getLineRange(data.modificationLeft[filePath]):[],
-            // modificationRight: this.Modification?this.getLineRange(data.modificationRight[filePath]):[],
             preMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)):[],
             postMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)):[],
             preRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)):[],
             postRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.rightSideLocations.some(loc => loc.path === filePath)):[],
-            // refactoringTypesLeft: this.showRefactorings ? refactoringTypes : [],
-            // refactoringTypesRight: this.showRefactorings ? refactoringTypes : []
-          
-            additionChangeRange: this.showModification ? additionChangeRange : [],
-            removalChangeRange: this.showModification ? removalChangeRange : [],
-            modificationLeftChangeRange: this.showChanges ? modificationLeftChangeRange : [],
-            modificationRightChangeRange: this.showChanges ? modificationRightChangeRange : [],
+            additionChangeRange: this.showChanges ? additionChangeRange : [],
+            removalChangeRange: this.showChanges ? removalChangeRange : [],
+            modificationLeftChangeRange: this.showModification ? modificationLeftChangeRange : [],
+            modificationRightChangeRange: this.showModification ? modificationRightChangeRange : [],
             preMicroChangeRange: this.showMicroChanges ? preMicroChangeRange : [],
             postMicroChangeRange: this.showMicroChangeRange ? postMicroChangeRange : [],
             preRefactoringRange: this.showRefactorings ? preRefactoringRange : [],
