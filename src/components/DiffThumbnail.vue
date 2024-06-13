@@ -39,16 +39,20 @@ export default {
       const rightColors = new Array(this.rightHeight + 1).fill('#BDC0BA'); // grey
 
       // Handling left color assignments
-      this.processIntervals(leftColors, this.modificationLeft, '#FBE251'); // yellow
-      this.processIntervals(leftColors, this.removal, '#FF0000'); // red
-      this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft); // refactorings
-      this.processIntervals(leftColors, this.microChangeLeft, '#B28FCE'); // purple
+      this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'low'); // low priority refactorings
+      this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'medium'); // medium priority refactorings
+      this.processIntervals(leftColors, this.modificationLeft, '#FBE251'); // yellow - modification
+      this.processIntervals(leftColors, this.removal, '#FF0000'); // red - removal
+      this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'high'); // high priority refactorings
+      this.processIntervals(leftColors, this.microChangeLeft, '#B28FCE'); // purple - micro change
 
       // Handling right color assignments
-      this.processIntervals(rightColors, this.modificationRight, '#FBE251'); // yellow
-      this.processIntervals(rightColors, this.addition, '#227D51'); // green
-      this.processRefactorings(rightColors, this.refactoringRight, this.refactoringTypesRight); // refactorings
-      this.processIntervals(rightColors, this.microChangeRight, '#B28FCE'); // purple
+      this.processRefactorings(rightColors, this.refactoringRight, this.refactoringTypesRight, 'low'); // low priority refactorings
+      this.processRefactorings(rightColors, this.refactoringRight, this.refactoringTypesRight, 'medium'); // medium priority refactorings
+      this.processIntervals(rightColors, this.modificationRight, '#FBE251'); // yellow - modification
+      this.processIntervals(rightColors, this.addition, '#227D51'); // green - addition
+      this.processRefactorings(rightColors, this.refactoringRight, this.refactoringTypesRight, 'high'); // high priority refactorings
+      this.processIntervals(rightColors, this.microChangeRight, '#B28FCE'); // purple - micro change
 
       this.leftblocks = this.createBlocks(leftColors, this.leftHeight);
       this.rightblocks = this.createBlocks(rightColors, this.rightHeight);
@@ -65,37 +69,34 @@ export default {
       });
     },
 
-    processRefactorings(colors, intervals, types) {
+    processRefactorings(colors, intervals, types, priority) {
       if (!intervals || intervals.length === 0) {
         return;
       }
 
-      // Separate intervals by type priority
-      const highPriorityIntervals = [];
-      const mediumPriorityIntervals = [];
-      const lowPriorityIntervals = [];
-
-      intervals.forEach((interval, idx) => {
+      const intervalsByPriority = intervals.map((interval, idx) => {
         const type = types && types[idx] ? types[idx] : '';
-        if(type.includes('Package') || type.includes('Class') || type.includes('Subclass') || type.includes('Superclass')){
-          lowPriorityIntervals.push({ interval, type });
-        } else if (type.includes("Method") || type.includes("Parameter") || type.includes("Thrown") || type.includes("Interface")){
-          mediumPriorityIntervals.push({ interval, type });
+        let priorityLevel;
+        if (type.includes('Package') || type.includes('Class') || type.includes('Subclass') || type.includes('Superclass')) {
+          priorityLevel = 'low';
+        } else if (type.includes("Method") || type.includes("Parameter") || type.includes("Thrown") || type.includes("Interface")) {
+          priorityLevel = 'medium';
         } else {
-          highPriorityIntervals.push({ interval, type });
+          priorityLevel = 'high';
         }
+        return { interval, priorityLevel, type };
       });
 
-      // Apply colors in reverse priority to ensure layering
-      this.applyRefactoringColors(colors, lowPriorityIntervals, '#81C7D4'); // light blue
-      this.applyRefactoringColors(colors, mediumPriorityIntervals, '#33A6B8'); // blue
-      this.applyRefactoringColors(colors, highPriorityIntervals, '#0D5661'); // dark blue
-    },
+      const filteredIntervals = intervalsByPriority.filter(item => item.priorityLevel === priority);
+      const colorMap = {
+        'low': '#81C7D4', // light blue
+        'medium': '#33A6B8', // blue
+        'high': '#0D5661' // dark blue
+      };
 
-    applyRefactoringColors(colors, intervals, color) {
-      intervals.forEach(({ interval }) => {
+      filteredIntervals.forEach(({ interval }) => {
         for (let i = interval[0]; i <= interval[1]; i++) {
-          colors[i] = color;
+          colors[i] = colorMap[priority];
         }
       });
     },
