@@ -3,7 +3,7 @@
     <div class="filters">
         <div class="filters">
             <label>
-                <input type="checkbox" v-model="Modification"> Modification
+                <input type="checkbox" v-model="showModification"> Modification
                 <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
             </label>
             <label>
@@ -30,9 +30,9 @@
           <FileViewer
             :fileName="file.name"
             :content="file.preChange"
-            :removal="file.removal"
-            :modificationLeft = "file.modificationLeft"
-            :modificationRight = "file.modificationRight"
+            :removal="this.getLineRange(file.removalChangeRange)"
+            :modificationLeft = "this.getLineRange(file.modificationLeftChangeRange)"
+            :modificationRight = "this.getLineRange(file.modificationRightChangeRange)"
             :microChanges="file.preMicroChanges"
             :refactorings="file.preRefactorings"
             class="file-viewer"
@@ -44,26 +44,27 @@
             :key="`${thumbnailUpdateKey}`"
             :leftHeight="file.preChange.length"
             :rightHeight="file.postChange.length"
-            :removal="this.convertMapToArray(file.removal)"
-            :addition="this.convertMapToArray(file.addition)"
-            :modificationLeft="this.convertMapToArray(file.modificationLeft)"
-            :modificationRight="this.convertMapToArray(file.modificationRight)"
-            :microChangeLeft="file.preMicroChanges.flatMap(mc => mc.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
-            :microChangeRight="file.postMicroChanges.flatMap(mc => mc.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
-            :refactoringLeft="file.preRefactorings.flatMap(ref => ref.leftSideLocations.map(loc => [loc.startLine, loc.endLine]))"
-            :refactoringRight="file.postRefactorings.flatMap(ref => ref.rightSideLocations.map(loc => [loc.startLine, loc.endLine]))"
+            :addition="file.additionChangeRange"
+            :removal="file.removalChangeRange"
+            :modificationLeft="file.modificationLeftChangeRange"
+            :modificationRight="file.modificationRightChangeRange"
+            :microChangeLeft="file.preMicroChangeRange"
+            :microChangeRight="file.postMicroChangeRange"
+            :refactoringLeft="file.preRefactoringRange"
+            :refactoringRight="file.postRefactoringRange"
             :refactoringTypesLeft="file.refactoringTypesLeft"
             :refactoringTypesRight="file.refactoringTypesRight"
+          
           />
         </div>
         <!-- FileViewer After -->
         <div class="file-viewer-wrap" style="flex-grow: 1; padding: 10px;">
           <FileViewer
-            :fileName="file.name "
+            :fileName="file.name"
             :content="file.postChange"
-            :addition="file.addition"
-            :modificationLeft = "file.modificationLeft"
-            :modificationRight = "file.modificationRight"
+            :addition="this.getLineRange(file.additionChangeRange)"
+            :modificationLeft = "this.getLineRange(file.modificationLeftChangeRange)"
+            :modificationRight = "this.getLineRange(file.modificationRightChangeRange)"
             :microChanges="file.postMicroChanges"
             :refactorings="file.postRefactorings"
             class="file-viewer"
@@ -88,7 +89,7 @@ export default {
   data() {
     return {
       files: [],
-      Modification: true,
+      showModification: true,
       showChanges: true,
       showMicroChanges: true,
       showRefactorings: true,
@@ -107,24 +108,50 @@ export default {
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
+        // console.log("refactorings ", data.refactorings);
+        const microChanges = this.extractFromSpecialChange(data.microChanges);
+        const refactorings = this.extractFromSpecialChange(data.refactorings);
+        // console.log("refactorings after: ", refactorings);
         this.files = Object.keys(data.preChangeSourceCode).map(filePath => {
           const preChangeLines = data.preChangeSourceCode[filePath].split(/\r?\n/);
           const postChangeLines = data.postChangeSourceCode[filePath].split(/\r?\n/);
-          const refactoringTypes = data.refactorings.map(r => r.type);
+          const additionChangeRange = data.addition[filePath] || [];
+          const removalChangeRange = data.removal[filePath] || [];
+          const modificationLeftChangeRange = data.modificationLeft[filePath] || [];
+          const modificationRightChangeRange = data.modificationRight[filePath] || [];
+
+          const preMicroChangeRange = microChanges.left[filePath];
+          const postMicroChangeRange = microChanges.right[filePath];
+          const preRefactoringRange = refactorings.left[filePath];
+          const postRefactoringRange = refactorings.right[filePath];
+          const refactoringTypesLeft = refactorings.leftTypes[filePath];
+          const refactoringTypesRight = refactorings.rightTypes[filePath];
+          console.log("removalChangeRange ", removalChangeRange);
           return {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
             postChange: postChangeLines.map(line => line + '\n'),
-            removal: this.showChanges?this.getLineRange(data.removal[filePath]):[],
-            addition: this.showChanges?this.getLineRange(data.addition[filePath]):[],
-            modificationLeft: this.Modification?this.getLineRange(data.modificationLeft[filePath]):[],
-            modificationRight: this.Modification?this.getLineRange(data.modificationRight[filePath]):[],
+            // removal: this.showChanges?this.getLineRange(data.removal[filePath]):[],
+            // addition: this.showChanges?this.getLineRange(data.addition[filePath]):[],
+            // modificationLeft: this.Modification?this.getLineRange(data.modificationLeft[filePath]):[],
+            // modificationRight: this.Modification?this.getLineRange(data.modificationRight[filePath]):[],
             preMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)):[],
             postMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)):[],
             preRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)):[],
             postRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.rightSideLocations.some(loc => loc.path === filePath)):[],
-            refactoringTypesLeft: this.showRefactorings ? refactoringTypes : [],
-            refactoringTypesRight: this.showRefactorings ? refactoringTypes : []
+            // refactoringTypesLeft: this.showRefactorings ? refactoringTypes : [],
+            // refactoringTypesRight: this.showRefactorings ? refactoringTypes : []
+          
+            additionChangeRange: this.showModification ? additionChangeRange : [],
+            removalChangeRange: this.showModification ? removalChangeRange : [],
+            modificationLeftChangeRange: this.showChanges ? modificationLeftChangeRange : [],
+            modificationRightChangeRange: this.showChanges ? modificationRightChangeRange : [],
+            preMicroChangeRange: this.showMicroChanges ? preMicroChangeRange : [],
+            postMicroChangeRange: this.showMicroChangeRange ? postMicroChangeRange : [],
+            preRefactoringRange: this.showRefactorings ? preRefactoringRange : [],
+            postRefactoringRange: this.showRefactorings ? postRefactoringRange : [],
+            refactoringTypesLeft: this.showRefactorings ? refactoringTypesLeft : [],
+            refactoringTypesRight: this.showRefactorings ? refactoringTypesRight : []
           };
         });
         this.updateThumbnails();
@@ -158,7 +185,39 @@ export default {
       }
   });
   return ranges;
-    }
+    },
+    extractFromSpecialChange(specialChanges) {
+            const grouped = {
+                left: {},
+                right: {},
+                leftTypes: {},
+                rightTypes: {}
+            };
+            for (const specialChange of specialChanges) {
+                for (const entry of specialChange.leftSideLocations) {
+                    if (!grouped.left[entry.path]) {
+                        grouped.left[entry.path] = []; // Initialize if not already
+                    }
+                    grouped.left[entry.path].push([entry.startLine, entry.endLine]);
+                    if (!grouped.leftTypes[entry.path]) {
+                        grouped.leftTypes[entry.path] = [];
+                    }
+                    grouped.leftTypes[entry.path].push(specialChange.type);
+                }
+
+                for (const entry of specialChange.rightSideLocations) {
+                    if (!grouped.right[entry.path]) {
+                        grouped.right[entry.path] = []; // Initialize if not already
+                    }
+                    grouped.right[entry.path].push([entry.startLine, entry.endLine]);
+                    if (!grouped.rightTypes[entry.path]) {
+                        grouped.rightTypes[entry.path] = [];
+                    }
+                    grouped.rightTypes[entry.path].push(specialChange.type);
+                }
+            }
+            return grouped;
+        },
   }
 }
 </script>

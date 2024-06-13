@@ -100,10 +100,11 @@ export default {
                 const data = await response.json();
                 const commitDetails = data.flatMap(commit => {
                     // collect the microchanges & refactorings
-                    const microChanges = this.extractRangeFromSpecialChange(commit.microChanges);
-                    const refactorings = this.extractRangeFromSpecialChange(commit.refactorings);
+                    const microChanges = this.extractFromSpecialChange(commit.microChanges);
+                    const refactorings = this.extractFromSpecialChange(commit.refactorings);
                     const url = commit.url;
-                    const refactoringTypes = commit.refactorings.map(r => r.type);
+                    // console.log("commit (general)", commit);
+                    // console.log("refactorings (general)", refactorings);
                     return Object.keys(commit.preChangeSourceCode).map(filePath => {
                         const additionChangeRange = commit.addition[filePath] || [];
                         const removalChangeRange = commit.removal[filePath] || [];
@@ -113,6 +114,10 @@ export default {
                         const postMicroChangeRange = microChanges.right[filePath];
                         const preRefactoringRange = refactorings.left[filePath];
                         const postRefactoringRange = refactorings.right[filePath];
+                        const refactoringTypesLeft = refactorings.leftTypes[filePath];
+                        const refactoringTypesRight = refactorings.rightTypes[filePath];
+
+                        // console.log("refactoringTypes", filePath, refactoringTypesLeft);
                         return {
                             sha1: commit.sha1,
                             filePath: filePath,
@@ -127,8 +132,8 @@ export default {
                             postMicroChangeRange: this.showMicroChangeRange ? postMicroChangeRange : [],
                             preRefactoringRange: this.showRefactorings ? preRefactoringRange : [],
                             postRefactoringRange: this.showRefactorings ? postRefactoringRange : [],
-                            refactoringTypesLeft: this.showRefactorings ? refactoringTypes : [],
-                            refactoringTypesRight: this.showRefactorings ? refactoringTypes : []
+                            refactoringTypesLeft: this.showRefactorings ? refactoringTypesLeft : [],
+                            refactoringTypesRight: this.showRefactorings ? refactoringTypesRight : []
                         };
                     });
                 });
@@ -152,7 +157,7 @@ export default {
                 return acc;
             }, []);
         },
-        extractRangeFromSpecialChange(specialChanges) {
+        extractFromSpecialChange(specialChanges) {
             const grouped = {
                 left: {},
                 right: {},
@@ -183,12 +188,12 @@ export default {
                 }
             }
 
-            for (const path in grouped.left) {
-                this.sortRanges(grouped.left[path]);
-            }
-            for (const path in grouped.right) {
-                this.sortRanges(grouped.right[path]);
-            }
+            // for (const path in grouped.left) {
+            //     this.sortRanges(grouped.left[path]);
+            // }
+            // for (const path in grouped.right) {
+            //     this.sortRanges(grouped.right[path]);
+            // }
 
             return grouped;
         },

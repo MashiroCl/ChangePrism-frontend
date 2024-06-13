@@ -46,8 +46,9 @@ export default {
         if (this.isMicroChange(index+1)) {
           return "micro-change";
         }
-        if(this.isRefactoring(index+1)){
-          return "refactoring";
+        const refactoringClass = this.getRefactoringClass(index+1);
+        if(refactoringClass){
+          return refactoringClass;
         }
         if (this.isRemoval(index-1)) {
           return "removal";
@@ -64,6 +65,7 @@ export default {
         return "";
       },
       isRemoval(index) {
+        console.log("this.removal", this.removal);
         return this.removal?this.removal[index]:false;
       },
       isAddition(index) {
@@ -75,11 +77,22 @@ export default {
           return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
         });
       },
-      isRefactoring(index){
-        return this.refactorings? this.refactorings.some(change => {
+      getRefactoringClass(index){
+        const refactoring = this.refactorings? this.refactorings.find(change => {
           const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
           return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
-        }): false;
+        }): null;
+        if(refactoring){
+          const type = refactoring.type;
+          if(type.includes('Package') || type.includes('Class') || type.includes('Subclass') || type.includes('Superclass')){
+            return 'refactoring-low-priority';
+          } else if (type.includes("Method") || type.includes("Parameter") || type.includes("Thrown") || type.includes("Interface")){
+            return 'refactoring-medium-priority';
+          } else {
+            return 'refactoring-high-priority';
+          }
+        }
+        return '';
       },
       isModificationLeft(index) {
         return this.modificationLeft && this.modificationLeft[index];
@@ -96,12 +109,6 @@ export default {
           const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
           return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
         });
-        if(microchange.length){
-          console.log("microchange ", microchange);
-        }
-        if(refactorings.length){
-          console.log("refactorings ", refactorings);
-        }
         let type = [];
         for(let i=0;i<microchange.length;i++){
           type.push(microchange[i].type);
@@ -129,8 +136,16 @@ export default {
   background-color: rgba(128, 0, 128, 0.2); /* Purple highlight */
   cursor: pointer; /* Change cursor on hover */
 }
-.refactoring{
-  background-color: rgba(61, 139, 202, 0.2); /* Blue highlight */
+.refactoring-high-priority {
+  background-color: rgba(13, 86, 97, 0.2); /* Dark blue highlight */
+  cursor: pointer; /* Change cursor on hover */
+}
+.refactoring-medium-priority {
+  background-color: rgba(51, 166, 184, 0.2); /* Blue highlight */
+  cursor: pointer; /* Change cursor on hover */
+}
+.refactoring-low-priority {
+  background-color: rgba(129, 199, 212, 0.2); /* Light blue highlight */
   cursor: pointer; /* Change cursor on hover */
 }
 .tooltip {
@@ -200,4 +215,3 @@ h3 {
   font-weight: bold;
 }
 </style>
-

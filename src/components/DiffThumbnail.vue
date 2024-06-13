@@ -77,7 +77,7 @@ export default {
 
       intervals.forEach((interval, idx) => {
         const type = types && types[idx] ? types[idx] : '';
-        if(type.includes('Package') || type.includes('Class') || type.includes('subClass')){
+        if(type.includes('Package') || type.includes('Class') || type.includes('Subclass') || type.includes('Superclass')){
           lowPriorityIntervals.push({ interval, type });
         } else if (type.includes("Method") || type.includes("Parameter") || type.includes("Thrown") || type.includes("Interface")){
           mediumPriorityIntervals.push({ interval, type });
