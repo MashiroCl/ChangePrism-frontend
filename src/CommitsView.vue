@@ -15,11 +15,13 @@
             </label>
             <label>
                 <input type="checkbox" v-model="showMicroChanges"> Micro Changes
-                <span class="color-indicator" :style="{ backgroundColor: 'purple' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#B28FCE' }"></span>
             </label>
             <label>
                 <input type="checkbox" v-model="showRefactorings"> Refactorings
-                <span class="color-indicator" :style="{ backgroundColor: 'blue' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#81C7D4' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#33A6B8' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#0D5661' }"></span>
             </label>
             <button @click="updateThumbnails" :style="{ marginLeft: '50px' }">Update Thumbnails</button>
         </div>

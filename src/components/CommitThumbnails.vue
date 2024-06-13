@@ -2,22 +2,24 @@
   <div>
     <div class="filters">
       <label>
-        <input type="checkbox" v-model="showModification"> Modification
-        <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
-      </label>
-      <label>
-        <input type="checkbox" v-model="showChanges"> Removal/Addition
-        <span class="color-indicator" :style="{ backgroundColor: 'red' }"></span>
-        <span class="color-indicator" :style="{ backgroundColor: 'green' }"></span>
-      </label>
-      <label>
-        <input type="checkbox" v-model="showMicroChanges"> Micro Changes
-        <span class="color-indicator" :style="{ backgroundColor: 'purple' }"></span>
-      </label>
-      <label>
-        <input type="checkbox" v-model="showRefactorings"> Refactorings
-        <span class="color-indicator" :style="{ backgroundColor: 'blue' }"></span>
-      </label>
+                <input type="checkbox" v-model="showModification"> Modification
+                <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showChanges"> Removal/Addition
+                <span class="color-indicator" :style="{ backgroundColor: 'red' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: 'green' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showMicroChanges"> Micro Changes
+                <span class="color-indicator" :style="{ backgroundColor: '#B28FCE' }"></span>
+            </label>
+            <label>
+                <input type="checkbox" v-model="showRefactorings"> Refactorings
+                <span class="color-indicator" :style="{ backgroundColor: '#81C7D4' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#33A6B8' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#0D5661' }"></span>
+            </label>
       <button @click="fetchCommitData">Update</button>
     </div>
     <div class="thumbnails-container">

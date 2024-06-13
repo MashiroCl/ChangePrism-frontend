@@ -1,8 +1,7 @@
 <template>
   <div>
     <div class="filters">
-        <div class="filters">
-            <label>
+      <label>
                 <input type="checkbox" v-model="showModification"> Modification
                 <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
             </label>
@@ -13,14 +12,14 @@
             </label>
             <label>
                 <input type="checkbox" v-model="showMicroChanges"> Micro Changes
-                <span class="color-indicator" :style="{ backgroundColor: 'purple' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#B28FCE' }"></span>
             </label>
             <label>
                 <input type="checkbox" v-model="showRefactorings"> Refactorings
-                <span class="color-indicator" :style="{ backgroundColor: 'blue' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#81C7D4' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#33A6B8' }"></span>
+                <span class="color-indicator" :style="{ backgroundColor: '#0D5661' }"></span>
             </label>
-            <button @click="fetchCommitData">Update</button>
-        </div>
       </div>
     <div class="files-container" v-for="(file, index) in files" :key="index">
       <!-- Use a flex container to keep elements horizontally aligned -->
