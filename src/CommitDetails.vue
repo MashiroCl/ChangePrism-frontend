@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="filters">
-      <label>
+        <div class="filters">
+          <label>
                 <input type="checkbox" v-model="showModification"> Modification
                 <span class="color-indicator" :style="{ backgroundColor: 'yellow' }"></span>
             </label>
@@ -20,7 +20,8 @@
                 <span class="color-indicator" :style="{ backgroundColor: '#33A6B8' }"></span>
                 <span class="color-indicator" :style="{ backgroundColor: '#0D5661' }"></span>
             </label>
-      </div>
+            <button @click="fetchCommitData">Update</button>
+        </div>
     <div class="files-container" v-for="(file, index) in files" :key="index">
       <!-- Use a flex container to keep elements horizontally aligned -->
       <div class="file-viewer-container" style="display: flex; align-items: flex-start; justify-content: center;">
@@ -211,6 +212,51 @@ export default {
 </script>
 
 <style>
+.filters {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.filters label {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.filters input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.filters .color-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
 .files-container {
   margin-bottom: 20px; /* Space between each file pair */
 }
