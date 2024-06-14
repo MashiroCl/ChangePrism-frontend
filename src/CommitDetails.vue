@@ -32,7 +32,6 @@
             :content="file.preChange"
             :removal="this.getLineRange(file.removalChangeRange)"
             :modificationLeft = "this.getLineRange(file.modificationLeftChangeRange)"
-            :modificationRight = "this.getLineRange(file.modificationRightChangeRange)"
             :microChanges="file.preMicroChanges"
             :refactorings="file.preRefactorings"
             class="file-viewer"
@@ -62,7 +61,6 @@
             :fileName="file.name"
             :content="file.postChange"
             :addition="this.getLineRange(file.additionChangeRange)"
-            :modificationLeft = "this.getLineRange(file.modificationLeftChangeRange)"
             :modificationRight = "this.getLineRange(file.modificationRightChangeRange)"
             :microChanges="file.postMicroChanges"
             :refactorings="file.postRefactorings"
@@ -114,29 +112,35 @@ export default {
           const postChangeLines = data.postChangeSourceCode[filePath].split(/\r?\n/);
           const additionChangeRange = data.addition[filePath] || [];
           const removalChangeRange = data.removal[filePath] || [];
+
           const modificationLeftChangeRange = data.modificationLeft[filePath] || [];
           const modificationRightChangeRange = data.modificationRight[filePath] || [];
 
           const preMicroChangeRange = microChanges.left[filePath];
           const postMicroChangeRange = microChanges.right[filePath];
+          const MicroChangeTypesLeft = microChanges.leftTypes[filePath];
+          const MicroChangeTypesRight = microChanges.rightTypes[filePath];
           const preRefactoringRange = refactorings.left[filePath];
           const postRefactoringRange = refactorings.right[filePath];
           const refactoringTypesLeft = refactorings.leftTypes[filePath];
           const refactoringTypesRight = refactorings.rightTypes[filePath];
+          
+          console.log("filePath:", filePath, "postMicroChangeRange", postMicroChangeRange);
+          // console.log("filePath:", filePath, "preRefactoringRange", preRefactoringRange);
           return {
             name: filePath,
             preChange: preChangeLines.map(line => line + '\n'),
             postChange: postChangeLines.map(line => line + '\n'),
-            preMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.leftSideLocations.some(loc => loc.path === filePath)):[],
-            postMicroChanges: this.showMicroChanges?data.microChanges.filter(mc => mc.rightSideLocations.some(loc => loc.path === filePath)):[],
-            preRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.leftSideLocations.some(loc => loc.path === filePath)):[],
-            postRefactorings: this.showRefactorings?data.refactorings.filter(ref =>ref.rightSideLocations.some(loc => loc.path === filePath)):[],
+            preMicroChanges: this.showMicroChanges? {"locations": preMicroChangeRange, "types": MicroChangeTypesLeft}:[],
+            postMicroChanges: this.showMicroChanges? {"locations": postMicroChangeRange, "types": MicroChangeTypesRight}:[],
+            preRefactorings: this.showRefactorings?{"locations": preRefactoringRange, "types": refactoringTypesLeft}: {},
+            postRefactorings: this.showRefactorings?{"locations":postRefactoringRange, "types": refactoringTypesRight}:{},
             additionChangeRange: this.showChanges ? additionChangeRange : [],
             removalChangeRange: this.showChanges ? removalChangeRange : [],
             modificationLeftChangeRange: this.showModification ? modificationLeftChangeRange : [],
             modificationRightChangeRange: this.showModification ? modificationRightChangeRange : [],
             preMicroChangeRange: this.showMicroChanges ? preMicroChangeRange : [],
-            postMicroChangeRange: this.showMicroChangeRange ? postMicroChangeRange : [],
+            postMicroChangeRange: this.showMicroChanges ? postMicroChangeRange : [],
             preRefactoringRange: this.showRefactorings ? preRefactoringRange : [],
             postRefactoringRange: this.showRefactorings ? postRefactoringRange : [],
             refactoringTypesLeft: this.showRefactorings ? refactoringTypesLeft : [],
@@ -157,23 +161,10 @@ export default {
       for (let i = 0; i < range.length; i++) {
         const [start, end] = range[i];
         for (let j = start; j <= end; j++) {
-          lineRange[j - 1] = true;
+          lineRange[j] = true;
         }
       }
       return lineRange;
-    },
-    convertMapToArray(map){
-      const ranges = [];
-      if(!map){
-        return ranges;
-      }
-      const keys = Object.keys(map).map(Number).sort((a, b) => a - b);
-      keys.forEach(key => {
-      if (map[key]) {
-        ranges.push([key, key]);
-      }
-  });
-  return ranges;
     },
     extractFromSpecialChange(specialChanges) {
             const grouped = {

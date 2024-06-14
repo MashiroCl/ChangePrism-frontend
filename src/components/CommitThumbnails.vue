@@ -123,7 +123,7 @@ export default {
       for (let i = 0; i < range.length; i++) {
         const [start, end] = range[i];
         for (let j = start; j <= end; j++) {
-          lineRange[j - 1] = true;
+          lineRange[j] = true;
         }
       }
       return lineRange;

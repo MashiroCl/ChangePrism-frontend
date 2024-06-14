@@ -45,64 +45,71 @@ export default {
     getLineClass(index) {
       const lineClasses = [];
 
-      if (this.isMicroChange(index + 1)) {
-        lineClasses.push("micro-change");
-      }
-
       const refactoringClass = this.getRefactoringClass(index + 1);
       if (refactoringClass) {
         lineClasses.push(refactoringClass);
       }
 
-      if (this.isRemoval(index - 1)) {
+      if (this.isRemoval(index)) {
         lineClasses.push("removal");
       }
 
-      if (this.isAddition(index - 1)) {
+      if (this.isAddition(index)) {
         lineClasses.push("addition");
       }
 
-      if (this.isModificationLeft(index - 1)) {
+      if (this.isModificationLeft(index)) {
         lineClasses.push("modificationLeft");
       }
 
-      if (this.isModificationRight(index - 1)) {
+      if (this.isModificationRight(index)) {
         lineClasses.push("modificationRight");
+      }
+
+      if (this.isMicroChange(index+1)) {
+        lineClasses.push("micro-change");
       }
 
       return lineClasses[lineClasses.length - 1] || "";
     },
     isRemoval(index) {
-      console.log("this.removal", this.removal);
       return this.removal ? this.removal[index] : false;
     },
     isAddition(index) {
       return this.addition ? this.addition[index] : false;
     },
     isMicroChange(index) {
-      return this.microChanges.some(change => {
-        const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
-        return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
-      });
+      return this.microChanges.locations
+                  .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
+                  .filter(i => i !== -1).length>0;
+      // return this.microChanges.some(change => {
+        // const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
+        // return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
+      // });
     },
     getRefactoringClass(index) {
-      const refactoring = this.refactorings ? this.refactorings.find(change => {
-        const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
-        return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
-      }) : null;
+      const type = [];
+      if (this.refactorings.locations) {
+          const matchedIndex = this.refactorings.locations
+                  .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
+                  .filter(i => i !== -1);
+          matchedIndex.forEach(p=>type.push(this.refactorings.types[p]));
+        }
+      let priorityLevel='';
 
-      if (refactoring) {
-        const type = refactoring.type;
-        if (type.includes('Package') || type.includes('Class') || type.includes('Subclass') || type.includes('Superclass')) {
-          return 'refactoring-low-priority';
-        } else if (type.includes("Method") || type.includes("Parameter") || type.includes("Thrown") || type.includes("Interface")) {
-          return 'refactoring-medium-priority';
-        } else {
-          return 'refactoring-high-priority';
+      if (type.length>0) {
+        if (type.some(item => item.includes('Package') || item.includes('Class') || item.includes('Subclass') || item.includes('Superclass'))) {
+          priorityLevel = 'refactoring-low-priority';
+        } 
+        if (type.some(item => item.includes('Method') || item.includes('Parameter') || item.includes('Thrown') || item.includes('Interface'))) {
+          priorityLevel ='refactoring-medium-priority';
+        } 
+        if (type.some(item => !item.includes('Package') && !item.includes('Class') && !item.includes('Subclass') && !item.includes('Superclass') && !item.includes('Method') && !item.includes('Parameter') && !item.includes('Thrown') && !item.includes('Interface'))) {
+          priorityLevel = 'refactoring-high-priority';
         }
       }
 
-      return '';
+      return priorityLevel;
     },
     isModificationLeft(index) {
       return this.modificationLeft && this.modificationLeft[index];
@@ -111,21 +118,21 @@ export default {
       return this.modificationRight && this.modificationRight[index];
     },
     getTooltipContent(index) {
-      const microchange = this.microChanges.filter(change => {
-        const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
-        return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
-      });
-      const refactorings = this.refactorings.filter(change => {
-        const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
-        return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
-      });
       let type = [];
-      for (let i = 0; i < microchange.length; i++) {
-        type.push(microchange[i].type);
+
+      if (this.microChanges.locations){
+        const matchedIndex = this.microChanges.locations
+              .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
+              .filter(i => i !== -1);
+        matchedIndex.forEach(p=>type.push(this.microChanges.types[p]));
       }
-      for (let i = 0; i < refactorings.length; i++) {
-        type.push(refactorings[i].type);
-      }
+
+        if (this.refactorings.locations) {
+          const matchedIndex = this.refactorings.locations
+                  .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
+                  .filter(i => i !== -1);
+          matchedIndex.forEach(p=>type.push(this.refactorings.types[p]));
+        }
 
       const uniqueSet = new Set(type);
       const result = Array.from(uniqueSet).join(",");

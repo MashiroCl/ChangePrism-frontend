@@ -38,6 +38,10 @@ export default {
       const leftColors = new Array(this.leftHeight + 1).fill('#BDC0BA'); // grey
       const rightColors = new Array(this.rightHeight + 1).fill('#BDC0BA'); // grey
 
+      console.log("this.microChangeLeft", this.microChangeLeft);
+      console.log("this.microChangeRight", this.microChangeRight);
+
+
       // Handling left color assignments
       this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'low'); // low priority refactorings
       this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'medium'); // medium priority refactorings
@@ -54,10 +58,10 @@ export default {
       this.processRefactorings(rightColors, this.refactoringRight, this.refactoringTypesRight, 'high'); // high priority refactorings
       this.processIntervals(rightColors, this.microChangeRight, '#B28FCE'); // purple - micro change
 
+
       this.leftblocks = this.createBlocks(leftColors, this.leftHeight);
       this.rightblocks = this.createBlocks(rightColors, this.rightHeight);
     },
-
     processIntervals(colors, intervals, defaultColor) {
       if (!intervals || intervals.length === 0) {
         return;
