@@ -45,7 +45,7 @@ export default {
     getLineClass(index) {
       const lineClasses = [];
 
-      const refactoringClass = this.getRefactoringClass(index + 1);
+      const refactoringClass = this.getRefactoringClass(index+1);
       if (refactoringClass) {
         lineClasses.push(refactoringClass);
       }
@@ -68,6 +68,15 @@ export default {
 
       if (this.isMicroChange(index+1)) {
         lineClasses.push("micro-change");
+      }
+
+      if (refactoringClass) {
+        if (refactoringClass === 'refactoring-high-priority') {
+          // Remove all other classes except micro-change
+          return lineClasses.includes("micro-change") 
+            ? "micro-change" 
+            : "refactoring-high-priority";
+        }
       }
 
       return lineClasses[lineClasses.length - 1] || "";

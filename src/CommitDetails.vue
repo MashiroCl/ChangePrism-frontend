@@ -125,7 +125,7 @@ export default {
           const refactoringTypesLeft = refactorings.leftTypes[filePath];
           const refactoringTypesRight = refactorings.rightTypes[filePath];
           
-          console.log("filePath:", filePath, "postMicroChangeRange", postMicroChangeRange);
+          // console.log("filePath:", filePath, "modificationRightChangeRange", modificationRightChangeRange);
           // console.log("filePath:", filePath, "preRefactoringRange", preRefactoringRange);
           return {
             name: filePath,

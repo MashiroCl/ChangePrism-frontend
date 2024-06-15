@@ -38,10 +38,6 @@ export default {
       const leftColors = new Array(this.leftHeight + 1).fill('#BDC0BA'); // grey
       const rightColors = new Array(this.rightHeight + 1).fill('#BDC0BA'); // grey
 
-      console.log("this.microChangeLeft", this.microChangeLeft);
-      console.log("this.microChangeRight", this.microChangeRight);
-
-
       // Handling left color assignments
       this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'low'); // low priority refactorings
       this.processRefactorings(leftColors, this.refactoringLeft, this.refactoringTypesLeft, 'medium'); // medium priority refactorings
@@ -99,7 +95,7 @@ export default {
       };
 
       filteredIntervals.forEach(({ interval }) => {
-        for (let i = interval[0]; i <= interval[1]; i++) {
+        for (let i = interval[0]-1; i <= interval[1]-1; i++) {
           colors[i] = colorMap[priority];
         }
       });
