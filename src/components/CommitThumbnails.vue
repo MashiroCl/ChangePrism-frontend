@@ -102,7 +102,7 @@ export default {
             modificationLeftChangeRange: this.showModification ? modificationLeftChangeRange : [],
             modificationRightChangeRange: this.showModification ? modificationRightChangeRange : [],
             preMicroChangeRange: this.showMicroChanges ? preMicroChangeRange : [],
-            postMicroChangeRange: this.showMicroChangeRange ? postMicroChangeRange : [],
+            postMicroChangeRange: this.showMicroChanges ? postMicroChangeRange : [],
             preRefactoringRange: this.showRefactorings ? preRefactoringRange : [],
             postRefactoringRange: this.showRefactorings ? postRefactoringRange : [],
             refactoringTypesLeft: this.showRefactorings ? refactoringTypesLeft : [],

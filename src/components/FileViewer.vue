@@ -88,13 +88,13 @@ export default {
       return this.addition ? this.addition[index] : false;
     },
     isMicroChange(index) {
-      return this.microChanges.locations
-                  .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
-                  .filter(i => i !== -1).length>0;
-      // return this.microChanges.some(change => {
-        // const locations = this.fileName.includes('(Before)') ? change.leftSideLocations : change.rightSideLocations;
-        // return locations.some(loc => loc.startLine <= index && index <= loc.endLine);
-      // });
+      // return  this.microChanges.locations
+      //             .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
+      //             .filter(i => i !== -1).length>0;
+
+      return  this.microChanges.locations?this.microChanges.locations
+              .map((loc, i) => (loc[0] <= index && index <= loc[1] ? i : -1))
+              .filter(i => i !== -1).length>0: false;
     },
     getRefactoringClass(index) {
       const type = [];
