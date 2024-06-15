@@ -206,11 +206,17 @@ export default {
 .filters {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Adjust space between filter bar and content */
     padding: 15px;
     background: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .filters label {
