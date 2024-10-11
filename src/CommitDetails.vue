@@ -20,7 +20,7 @@
                 <span class="color-indicator" :style="{ backgroundColor: '#33A6B8' }"></span>
                 <span class="color-indicator" :style="{ backgroundColor: '#0D5661' }"></span>
             </label>
-            <button @click="fetchCommitData">Update</button>
+            <button @click="fetchCommitData">Filter</button>
         </div>
     <div class="files-container" v-for="(file, index) in files" :key="index">
       <!-- Use a flex container to keep elements horizontally aligned -->

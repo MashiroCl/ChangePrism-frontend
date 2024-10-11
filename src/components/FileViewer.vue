@@ -162,15 +162,15 @@ export default {
   cursor: pointer; /* Change cursor on hover */
 }
 .refactoring-high-priority {
-  background-color: rgba(13, 86, 97, 0.2); /* Dark blue highlight */
+  background-color: rgba(13, 86, 97, 0.2); /* Dark blue highlight #0D5661 */
   cursor: pointer; /* Change cursor on hover */
 }
 .refactoring-medium-priority {
-  background-color: rgba(51, 166, 184, 0.2); /* Blue highlight */
+  background-color: rgba(51, 166, 184, 0.2); /* Blue highlight #33A6B8 */
   cursor: pointer; /* Change cursor on hover */
 }
 .refactoring-low-priority {
-  background-color: rgba(129, 199, 212, 0.2); /* Light blue highlight */
+  background-color: rgba(129, 199, 212, 0.2); /* Light blue highlight  #81C7D4 */
   cursor: pointer; /* Change cursor on hover */
 }
 .tooltip {

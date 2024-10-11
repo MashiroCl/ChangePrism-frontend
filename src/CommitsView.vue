@@ -23,7 +23,7 @@
                 <span class="color-indicator" :style="{ backgroundColor: '#33A6B8' }"></span>
                 <span class="color-indicator" :style="{ backgroundColor: '#0D5661' }"></span>
             </label>
-            <button @click="updateThumbnails" :style="{ marginLeft: '50px' }">Update Thumbnails</button>
+            <button @click="updateThumbnails" :style="{ marginLeft: '50px' }">Filter</button>
         </div>
         <div class="commits">
             <!-- Commit Group section -->
@@ -33,7 +33,7 @@
                     <a :href="`/commits/${commitGroup[0].sha1}`" class="commit-link">
                         <h3 class="commit-title">Commit: {{ commitGroup[0].sha1 }}</h3>
                     </a>
-                    <button @click="viewCommitDetails(commitGroup[0].sha1)" class="view-thumbnails-button">View Thumbnails</button>
+                    <button @click="viewCommitDetails(commitGroup[0].sha1)" class="view-thumbnails-button">View Commit Insight</button>
                 </div>
                 <a :href="`${commitGroup[0].url}`">{{commitGroup[0].url}}</a>
 
