@@ -1,5 +1,5 @@
-# change_visualizer
-
+# Change Prism
+The frontend for Change Prism, the backend is [here](https://github.com/MashiroCl/ChangePrism-backend)
 ## Project setup
 ```
 npm install
